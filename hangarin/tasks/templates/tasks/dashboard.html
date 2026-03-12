@@ -1,240 +1,144 @@
 {% extends 'tasks/base.html' %}
+{% load static %}
 
 {% block title %}Dashboard{% endblock %}
 {% block page_title %}Dashboard{% endblock %}
 
-{% block extra_css %}
-<style>
-      .stats-grid {
-        display: grid; grid-template-columns: repeat(4,1fr);
-        gap: 16px; margin-bottom: 32px;
-        animation: fadeInUp 0.4s ease both;
-      }
-      .stat-card {
-        background: var(--stat-bg);
-        border: 1px solid var(--stat-border);
-        border-radius: 12px;
-        padding: 24px 28px;
-        transition: box-shadow 0.2s, border-color 0.2s, background 0.3s;
-        position: relative;
-        overflow: hidden;
-      }
-      .stat-card:hover {
-        box-shadow: 0 4px 24px rgba(0,0,0,0.12);
-        border-color: var(--accent);
-      }
-      .stat-card::after {
-        content: '';
-        position: absolute;
-        bottom: 0; left: 0; right: 0;
-        height: 2px;
-        background: var(--accent);
-        transform: scaleX(0);
-        transition: transform 0.2s ease;
-        transform-origin: left;
-      }
-      .stat-card:hover::after { transform: scaleX(1); }
-      .stat-label {
-        font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em;
-        color: var(--muted); margin-bottom: 12px; font-weight: 500;
-      }
-      .stat-value {
-        font-family: 'DM Sans', sans-serif; font-size: 36px; font-weight: 700;
-        line-height: 1; color: var(--text); margin-bottom: 6px;
-      }
-      .stat-sub { font-size: 12px; color: var(--muted); }
-
-      .two-col {
-        display: grid; grid-template-columns: 1fr 320px; gap: 24px;
-        animation: fadeInUp 0.5s ease 0.1s both;
-      }
-
-      .card {
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        overflow: hidden;
-        transition: background 0.3s, border-color 0.3s;
-      }
-      .card-header {
-        padding: 20px 24px; border-bottom: 1px solid var(--border);
-        display: flex; align-items: center;
-      }
-      .card-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; flex: 1; color: var(--text); }
-
-      .task-table { width: 100%; border-collapse: collapse; }
-      .task-table th {
-        padding: 12px 24px; font-size: 11px; text-transform: uppercase;
-        letter-spacing: 0.08em; color: var(--muted); text-align: left;
-        background: rgba(128,128,128,0.04); font-weight: 500;
-      }
-      .task-table td {
-        padding: 14px 24px; font-size: 13px;
-        border-top: 1px solid var(--border); vertical-align: middle;
-        color: var(--text);
-      }
-      .task-row { transition: background 0.1s; cursor: pointer; }
-      .task-row:hover td { background: rgba(128,128,128,0.04); }
-      .task-title-text { font-weight: 500; color: var(--text); }
-      .task-sub-text { font-size: 11px; color: var(--muted); margin-top: 2px; }
-
-      .badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; }
-      .badge-pending { background: rgba(245,158,11,0.12); color: var(--pending); }
-      .badge-progress { background: rgba(59,130,246,0.12); color: var(--progress); }
-      .badge-done { background: rgba(16,185,129,0.12); color: var(--done); }
-
-      .priority-dot { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
-      .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-      .dot-Critical { background: var(--critical); }
-      .dot-High { background: var(--high); }
-      .dot-Medium { background: var(--medium); }
-      .dot-Low { background: var(--low); }
-      .dot-Optional { background: var(--low); }
-
-      .right-col { display: flex; flex-direction: column; gap: 24px; }
-
-      .progress-list { padding: 20px 24px; display: flex; flex-direction: column; gap: 16px; }
-      .progress-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-      .progress-name { font-size: 13px; font-weight: 500; color: var(--text); }
-      .progress-pct { font-size: 12px; color: var(--muted); font-weight: 500; }
-      .progress-bar-bg { height: 5px; background: var(--surface2); border-radius: 10px; overflow: hidden; }
-      .progress-bar-fill { height: 100%; border-radius: 10px; background: var(--accent); transition: width 0.6s ease; }
-
-      .deadline-list { padding: 16px 24px; display: flex; flex-direction: column; }
-      .deadline-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
-      .deadline-item:last-child { border-bottom: none; }
-      .deadline-date { width: 40px; text-align: center; flex-shrink: 0; }
-      .deadline-day { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; color: var(--accent); line-height: 1; }
-      .deadline-month { font-size: 10px; text-transform: uppercase; color: var(--muted); letter-spacing: 0.08em; }
-      .deadline-title { font-size: 13px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-      .deadline-cat { font-size: 11px; color: var(--muted); }
-
-      .empty { padding: 40px; text-align: center; color: var(--muted); font-size: 13px; }
-      .empty a { color: var(--accent); text-decoration: none; }
-      .empty a:hover { text-decoration: underline; }
-</style>
-{% endblock %}
-
 {% block content %}
 
-<div class="stats-grid">
-  <div class="stat-card">
-    <div class="stat-label">Total Tasks</div>
-    <div class="stat-value">{{ total_tasks }}</div>
-    <div class="stat-sub">All categories</div>
+<div class="row g-3 mb-4 fade-up">
+  <div class="col-md-3">
+    <div class="stat-card">
+      <div class="stat-label">Total Tasks</div>
+      <div class="stat-value">{{ total_tasks }}</div>
+      <div class="stat-sub">All categories</div>
+    </div>
   </div>
-  <div class="stat-card">
-    <div class="stat-label">In Progress</div>
-    <div class="stat-value">{{ in_progress }}</div>
-    <div class="stat-sub">Active right now</div>
+  <div class="col-md-3">
+    <div class="stat-card">
+      <div class="stat-label">In Progress</div>
+      <div class="stat-value">{{ in_progress }}</div>
+      <div class="stat-sub">Active right now</div>
+    </div>
   </div>
-  <div class="stat-card">
-    <div class="stat-label">Completed</div>
-    <div class="stat-value">{{ completed }}</div>
-    <div class="stat-sub">Tasks done</div>
+  <div class="col-md-3">
+    <div class="stat-card">
+      <div class="stat-label">Completed</div>
+      <div class="stat-value">{{ completed }}</div>
+      <div class="stat-sub">Tasks done</div>
+    </div>
   </div>
-  <div class="stat-card">
-    <div class="stat-label">Pending</div>
-    <div class="stat-value">{{ pending }}</div>
-    <div class="stat-sub">Awaiting action</div>
+  <div class="col-md-3">
+    <div class="stat-card">
+      <div class="stat-label">Pending</div>
+      <div class="stat-value">{{ pending }}</div>
+      <div class="stat-sub">Awaiting action</div>
+    </div>
   </div>
 </div>
 
-<div class="two-col">
+<div class="row g-3 fade-up-2">
 
-  <div class="card">
-    <div class="card-header">
-      <div class="card-title">Recent Tasks</div>
+  <div class="col-lg-8">
+    <div class="h-card">
+      <div class="h-card-header">
+        <div class="h-card-title">Recent Tasks</div>
+        <a href="{% url 'task_list' %}" style="font-size:12px;color:var(--accent);text-decoration:none">View all →</a>
+      </div>
+      {% if tasks %}
+      <table class="h-table">
+        <thead>
+          <tr>
+            <th>Task</th>
+            <th>Status</th>
+            <th>Priority</th>
+            <th>Deadline</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for task in tasks %}
+          <tr style="cursor:pointer" onclick="window.location='{% url 'task_detail' task.pk %}'">
+            <td>
+              <div style="font-weight:600;font-size:13px">
+                <a href="/admin/tasks/task/{{ task.pk }}/change/" style="text-decoration:none;color:inherit;">
+                  {{ task.title }}
+                </a>
+              </div>
+              <div style="font-size:11px;color:var(--muted)">
+                {{ task.category.name }}
+              </div>
+            </td>
+            <td>
+              {% if task.status == "Completed" %}
+                <span class="badge-done">Completed</span>
+              {% elif task.status == "In Progress" %}
+                <span class="badge-progress">In Progress</span>
+              {% else %}
+                <span class="badge-pending">Pending</span>
+              {% endif %}
+            </td>
+            <td style="font-size:12px;color:var(--muted)">
+              <span class="dot dot-{{ task.priority.name }}"></span>{{ task.priority.name }}
+            </td>
+            <td style="font-size:12px;color:var(--muted)">{{ task.deadline|date:"M d" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="p-4 text-center" style="color:var(--muted);font-size:13px">
+        No tasks yet. <a href="{% url 'task_add' %}" style="color:var(--accent)">Add one →</a>
+      </div>
+      {% endif %}
     </div>
-    {% if tasks %}
-    <table class="task-table">
-      <thead>
-        <tr>
-          <th>Task</th>
-          <th>Status</th>
-          <th>Priority</th>
-          <th>Category</th>
-          <th>Deadline</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for task in tasks %}
-        <tr class="task-row">
-          <td>
-            <div class="task-title-text">{{ task.title }}</div>
-            <div class="task-sub-text">{{ task.subtask_set.count }} subtask{{ task.subtask_set.count|pluralize }}</div>
-          </td>
-          <td>
-            {% if task.status == "Completed" %}
-              <span class="badge badge-done">Completed</span>
-            {% elif task.status == "In Progress" %}
-              <span class="badge badge-progress">In Progress</span>
-            {% else %}
-              <span class="badge badge-pending">Pending</span>
-            {% endif %}
-          </td>
-          <td>
-            <span class="priority-dot">
-              <span class="dot dot-{{ task.priority.name }}"></span>
-              {{ task.priority.name }}
-            </span>
-          </td>
-          <td style="font-size:12px;color:var(--muted)">{{ task.category.name }}</td>
-          <td style="font-size:12px;color:var(--muted)">{{ task.deadline|date:"M d" }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    {% else %}
-    <div class="empty">No tasks yet. <a href="/admin/tasks/task/add/">Add one →</a></div>
-    {% endif %}
   </div>
 
-  <div class="right-col">
+  <div class="col-lg-4 d-flex flex-column gap-3">
 
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">Progress by Category</div>
+    <div class="h-card">
+      <div class="h-card-header">
+        <div class="h-card-title">Progress by Category</div>
       </div>
-      <div class="progress-list">
+      <div class="p-3 d-flex flex-column gap-3">
         {% for cat in category_progress %}
         <div>
-          <div class="progress-top">
-            <span class="progress-name">{{ cat.name }}</span>
-            <span class="progress-pct">{{ cat.percent }}%</span>
+          <div class="d-flex justify-content-between mb-1">
+            <span style="font-size:13px;font-weight:500;color:var(--text)">{{ cat.name }}</span>
+            <span style="font-size:12px;color:var(--muted)">{{ cat.percent }}%</span>
           </div>
-          <div class="progress-bar-bg">
-            <div class="progress-bar-fill" style="width:{{ cat.percent }}%"></div>
+          <div class="h-progress-bg">
+            <div class="h-progress-fill" style="width:{{ cat.percent }}%"></div>
           </div>
         </div>
         {% empty %}
-        <div class="empty">No categories found.</div>
+        <p style="font-size:13px;color:var(--muted)">No categories found.</p>
         {% endfor %}
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">Upcoming Deadlines</div>
+    <div class="h-card">
+      <div class="h-card-header">
+        <div class="h-card-title">Upcoming Deadlines</div>
       </div>
-      <div class="deadline-list">
+      <div class="p-2">
         {% for task in upcoming %}
-        <div class="deadline-item">
-          <div class="deadline-date">
-            <div class="deadline-day">{{ task.deadline|date:"d" }}</div>
-            <div class="deadline-month">{{ task.deadline|date:"M" }}</div>
+        <div class="d-flex align-items-center gap-3 p-2" style="border-bottom:1px solid var(--border)">
+          <div class="text-center" style="width:38px;flex-shrink:0">
+            <div style="font-size:18px;font-weight:800;color:var(--accent);line-height:1">{{ task.deadline|date:"d" }}</div>
+            <div style="font-size:10px;text-transform:uppercase;color:var(--muted)">{{ task.deadline|date:"M" }}</div>
           </div>
           <div style="flex:1;min-width:0">
-            <div class="deadline-title">{{ task.title }}</div>
-            <div class="deadline-cat">{{ task.category.name }} · {{ task.priority.name }}</div>
+            <div style="font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)">{{ task.title }}</div>
+            <div style="font-size:11px;color:var(--muted)">{{ task.category.name }}</div>
           </div>
         </div>
         {% empty %}
-        <div class="empty">No upcoming deadlines.</div>
+        <div class="p-3 text-center" style="font-size:13px;color:var(--muted)">No upcoming deadlines.</div>
         {% endfor %}
       </div>
     </div>
 
   </div>
 </div>
+
 {% endblock %}

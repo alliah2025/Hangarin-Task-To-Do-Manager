@@ -1,8 +1,89 @@
 {% extends 'tasks/base.html' %}
+{% load static %}
 
 {% block title %}All Tasks{% endblock %}
 {% block page_title %}All Tasks{% endblock %}
 
 {% block content %}
-<p style="color:var(--muted)">Task list coming soon...</p>
+<div class="h-card fade-up">
+
+  <div class="h-card-header">
+    <div class="h-card-title">Task List</div>
+  </div>
+
+    <div class="p-3 border-bottom" style="border-color: var(--border);">
+    <form method="GET" action="{% url 'task_list' %}" class="d-flex gap-2">
+        <input type="text" name="search" value="{{ search }}" placeholder="Search tasks..." class="h-form-control" />
+        <button type="submit" class="btn-hangarin">Search</button>
+    </form>
+    </div>
+
+  {% if tasks %}
+  <table class="h-table">
+    <thead>
+      <tr>
+        <th>Task</th>
+        <th>Category</th>
+        <th>Status</th>
+        <th>Priority</th>
+        <th>Deadline</th>
+        <th style="width:90px;">Action</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {% for task in tasks %}
+      <tr>
+        <td>
+          <div style="font-weight:600;font-size:14px">
+            <a href="/admin/tasks/task/{{ task.pk }}/change/" style="text-decoration:none;color:inherit;">
+              {{ task.title }}
+            </a>
+          </div>
+          {% if task.description %}
+          <div style="font-size:11px;color:var(--muted);">
+            {{ task.description|truncatechars:60 }}
+          </div>
+          {% endif %}
+        </td>
+        <td style="font-size:12px;color:var(--muted);">
+          {{ task.category.name }}
+        </td>
+        <td>
+          {% if task.status == "Completed" %}
+            <span class="badge-done">Completed</span>
+          {% elif task.status == "In Progress" %}
+            <span class="badge-progress">In Progress</span>
+          {% else %}
+            <span class="badge-pending">Pending</span>
+          {% endif %}
+        </td>
+
+        <td style="font-size:12px;color:var(--muted);">
+          <span class="dot dot-{{ task.priority.name }}"></span>
+          {{ task.priority.name }}
+        </td>
+        <td style="font-size:12px;color:var(--muted);">
+          {% if task.deadline %}
+            {{ task.deadline|date:"M d, Y" }}
+          {% else %}
+            —
+          {% endif %}
+        </td>
+        <td>
+          <a href="/admin/tasks/task/{{ task.pk }}/change/" class="btn-outline-hangarin">
+            Edit
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% else %}
+  <div class="p-4 text-center" style="color:var(--muted);">
+    No tasks found.
+  </div>
+  {% endif %}
+</div>
 {% endblock %}
