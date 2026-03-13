@@ -56,13 +56,10 @@
         </td>
         <td style="font-size:12px;color:var(--muted)">{{ note.created_at|date:"M d, Y" }}</td>
         <td>
-          <form method="POST" action="{% url 'note_delete' note.pk %}">
-            {% csrf_token %}
-            <button type="submit" onclick="return confirm('Delete this note?')"
-              style="background:none;border:1px solid var(--critical);color:var(--critical);padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;">
-              Delete
-            </button>
-          </form>
+          <a href="{% url 'note_confirm_delete' note.pk %}" 
+            style="border:1px solid var(--critical);color:var(--critical);padding:4px 10px;border-radius:6px;font-size:11px;text-decoration:none;">
+            Delete
+          </a>
         </td>
       </tr>
       {% endfor %}
@@ -70,7 +67,7 @@
   </table>
   {% else %}
   <div class="p-4 text-center" style="color:var(--muted);font-size:13px">
-    No notes found. <a href="{% url 'note_add' %}" style="color:var(--accent)">Add one →</a>
+    No notes found. <a href="{% url 'note_add' %}" style="color:var(--accent)">Add one</a>
   </div>
   {% endif %}
 

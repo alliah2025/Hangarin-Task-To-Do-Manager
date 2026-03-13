@@ -10,6 +10,46 @@
     <a href="{% url 'subtask_add' %}" class="btn-hangarin" style="font-size:12px;padding:6px 14px">+ Add Subtask</a>
   </div>
 
+  <!-- Search -->
+  <div class="p-3" style="border-bottom:1px solid var(--border)">
+    <form method="GET" class="d-flex gap-2">
+      <input type="text" name="search" value="{{ search }}" placeholder="Search subtasks..." class="h-form-control">
+      <button type="submit" class="btn-hangarin">Search</button>
+      {% if search %}
+      <a href="{% url 'subtask_list' %}" class="btn-outline-hangarin">Clear</a>
+      {% endif %}
+    </form>
+  </div>
+
+  <!-- Sort & Filter -->
+  <div class="p-3 d-flex gap-2 flex-wrap" style="border-bottom:1px solid var(--border)">
+    <form method="GET" class="d-flex gap-2 flex-wrap">
+      {% if search %}
+      <input type="hidden" name="search" value="{{ search }}">
+      {% endif %}
+
+      <select name="task" class="h-form-control" style="width:auto;min-width:180px">
+        <option value="">All Tasks</option>
+        {% for task in tasks %}
+        <option value="{{ task.pk }}" {% if task_filter == task.pk|stringformat:"s" %}selected{% endif %}>
+          {{ task.title|truncatechars:40 }}
+        </option>
+        {% endfor %}
+      </select>
+
+      <select name="sort" class="h-form-control" style="width:auto">
+        <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest First</option>
+        <option value="oldest" {% if sort == 'oldest' %}selected{% endif %}>Oldest First</option>
+      </select>
+
+      <button type="submit" class="btn-hangarin" style="font-size:12px;padding:7px 16px">Sort</button>
+
+      {% if task_filter or sort != 'newest' %}
+      <a href="{% url 'subtask_list' %}" class="btn-outline-hangarin" style="font-size:12px">Clear</a>
+      {% endif %}
+    </form>
+  </div>
+
   {% if subtasks %}
   <table class="h-table">
     <thead>
@@ -24,7 +64,11 @@
       {% for sub in subtasks %}
       <tr>
         <td style="font-size:13px;font-weight:500;color:var(--text)">{{ sub.title }}</td>
-        <td style="font-size:12px;color:var(--muted)">{{ sub.parent_task.title }}</td>
+        <td>
+          <a href="{% url 'task_detail' sub.parent_task.pk %}" style="font-size:12px;color:var(--accent);text-decoration:none">
+            {{ sub.parent_task.title|truncatechars:40 }}
+          </a>
+        </td>
         <td>
           {% if sub.status == "Completed" %}
             <span class="badge-done">Completed</span>
@@ -35,22 +79,20 @@
           {% endif %}
         </td>
         <td>
-          <form method="POST" action="{% url 'subtask_delete' sub.pk %}">
-            {% csrf_token %}
-            <button type="submit" onclick="return confirm('Delete this subtask?')"
-              style="background:none;border:1px solid var(--critical);color:var(--critical);padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;">
-              Delete
-            </button>
-          </form>
+          <a href="{% url 'subtask_confirm_delete' sub.pk %}"
+            style="border:1px solid var(--critical);color:var(--critical);padding:4px 10px;border-radius:6px;font-size:11px;text-decoration:none;">
+            Delete
+          </a>
         </td>
-      </tr>
+              </tr>
       {% endfor %}
     </tbody>
   </table>
   {% else %}
   <div class="p-4 text-center" style="color:var(--muted);font-size:13px">
-    No subtasks yet. <a href="{% url 'subtask_add' %}" style="color:var(--accent)">Add one →</a>
+    No subtasks found. <a href="{% url 'subtask_add' %}" style="color:var(--accent)">Add one →</a>
   </div>
   {% endif %}
+
 </div>
 {% endblock %}

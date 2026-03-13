@@ -12,12 +12,12 @@ urlpatterns = [
     # Notes
     path('notes/', views.note_list, name='note_list'),
     path('notes/add/', views.note_add, name='note_add'),
-    path('notes/<int:pk>/delete/', views.note_delete, name='note_delete'),
+    path('notes/<int:pk>/confirm-delete/', views.note_confirm_delete, name='note_confirm_delete'),
 
     # Subtasks
     path('subtasks/', views.subtask_list, name='subtask_list'),
     path('subtasks/add/', views.subtask_add, name='subtask_add'),
-    path('subtasks/<int:pk>/delete/', views.subtask_delete, name='subtask_delete'),
+    path('subtasks/<int:pk>/confirm-delete/', views.subtask_confirm_delete, name='subtask_confirm_delete'),
 
     # Categories
     path('categories/', views.category_list, name='category_list'),

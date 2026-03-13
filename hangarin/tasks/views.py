@@ -111,17 +111,14 @@ def task_delete(request, pk):
 def note_list(request):
     notes = Note.objects.select_related('task').order_by('-created_at')
     tasks = Task.objects.all()
-
     task_filter = request.GET.get('task', '')
     sort = request.GET.get('sort', 'newest')
-
     if task_filter:
         notes = notes.filter(task_id=task_filter)
     if sort == 'oldest':
         notes = notes.order_by('created_at')
     else:
         notes = notes.order_by('-created_at')
-
     return render(request, 'tasks/note_list.html', {
         'notes': notes,
         'tasks': tasks,
@@ -143,17 +140,38 @@ def note_add(request):
         'total_tasks': Task.objects.count(),
     })
 
-def note_delete(request, pk):
+def note_confirm_delete(request, pk):
     note = get_object_or_404(Note, pk=pk)
     if request.method == 'POST':
         note.delete()
-    return redirect('note_list')
+        return redirect('note_list')
+    return render(request, 'tasks/note_confirm_delete.html', {
+        'note': note,
+        'total_tasks': Task.objects.count(),
+    })
+
 
 def subtask_list(request):
     subtasks = SubTask.objects.select_related('parent_task').order_by('-id')
+    tasks = Task.objects.all()
+    task_filter = request.GET.get('task', '')
+    sort = request.GET.get('sort', 'newest')
+    search = request.GET.get('search', '')
+    if task_filter:
+        subtasks = subtasks.filter(parent_task_id=task_filter)
+    if search:
+        subtasks = subtasks.filter(title__icontains=search)
+    if sort == 'oldest':
+        subtasks = subtasks.order_by('id')
+    else:
+        subtasks = subtasks.order_by('-id')
     return render(request, 'tasks/subtask_list.html', {
         'subtasks': subtasks,
+        'tasks': tasks,
         'total_tasks': Task.objects.count(),
+        'task_filter': task_filter,
+        'sort': sort,
+        'search': search,
     })
 
 def subtask_add(request):
@@ -170,11 +188,15 @@ def subtask_add(request):
         'total_tasks': Task.objects.count(),
     })
 
-def subtask_delete(request, pk):
+def subtask_confirm_delete(request, pk):
     subtask = get_object_or_404(SubTask, pk=pk)
     if request.method == 'POST':
         subtask.delete()
-    return redirect('subtask_list')
+        return redirect('subtask_list')
+    return render(request, 'tasks/subtask_confirm_delete.html', {
+        'subtask': subtask,
+        'total_tasks': Task.objects.count(),
+    })
 
 def category_list(request):
     categories = Category.objects.all()
