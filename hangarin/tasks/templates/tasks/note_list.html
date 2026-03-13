@@ -1,0 +1,48 @@
+{% extends 'tasks/base.html' %}
+
+{% block title %}Notes{% endblock %}
+{% block page_title %}Notes{% endblock %}
+
+{% block content %}
+<div class="h-card fade-up">
+  <div class="h-card-header">
+    <div class="h-card-title">All Notes</div>
+    <a href="{% url 'note_add' %}" class="btn-hangarin" style="font-size:12px;padding:6px 14px">+ Add Note</a>
+  </div>
+
+  {% if notes %}
+  <table class="h-table">
+    <thead>
+      <tr>
+        <th>Note</th>
+        <th>Task</th>
+        <th>Created</th>
+        <th style="width:80px">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for note in notes %}
+      <tr>
+        <td style="font-size:13px;color:var(--text)">{{ note.content|truncatechars:80 }}</td>
+        <td style="font-size:12px;color:var(--muted)">{{ note.task.title }}</td>
+        <td style="font-size:12px;color:var(--muted)">{{ note.created_at|date:"M d, Y" }}</td>
+        <td>
+          <form method="POST" action="{% url 'note_delete' note.pk %}">
+            {% csrf_token %}
+            <button type="submit" onclick="return confirm('Delete this note?')"
+              style="background:none;border:1px solid var(--critical);color:var(--critical);padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;">
+              Delete
+            </button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="p-4 text-center" style="color:var(--muted);font-size:13px">
+    No notes yet. <a href="{% url 'note_add' %}" style="color:var(--accent)">Add one →</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

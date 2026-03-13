@@ -35,14 +35,18 @@
       </a>
 
       <div class="nav-section-label">Organize</div>
-      <a href="/admin/tasks/category/" class="sidebar-link">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
-        Categories
-      </a>
-      <a href="/admin/tasks/note/" class="sidebar-link">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        Notes
-      </a>
+        <a href="{% url 'category_list' %}" class="sidebar-link {% if request.resolver_match.url_name == 'category_list' %}active{% endif %}">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+          Categories
+        </a>
+        <a href="{% url 'note_list' %}" class="sidebar-link {% if request.resolver_match.url_name == 'note_list' %}active{% endif %}">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Notes
+        </a>
+        <a href="{% url 'subtask_list' %}" class="sidebar-link {% if request.resolver_match.url_name == 'subtask_list' %}active{% endif %}">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+          Subtasks
+        </a>
 
       <div class="nav-section-label">Account</div>
       <a href="/admin/" class="sidebar-link">
