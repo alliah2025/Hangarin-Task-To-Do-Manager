@@ -1,0 +1,30 @@
+{% extends 'tasks/base.html' %}
+
+{% block title %}Delete Task{% endblock %}
+{% block page_title %}Delete Task{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center fade-up">
+  <div class="col-lg-5">
+    <div class="h-card">
+      <div class="h-card-header">
+        <div class="h-card-title" style="color:var(--critical)">⚠ Confirm Delete</div>
+      </div>
+      <div class="p-4 text-center">
+        <p style="font-size:14px;color:var(--muted);margin-bottom:8px">You are about to delete:</p>
+        <p style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:24px">"{{ task.title }}"</p>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:28px">This action cannot be undone.</p>
+        <form method="POST" class="d-flex gap-2 justify-content-center">
+          {% csrf_token %}
+          <button type="submit" class="btn-hangarin" style="background:var(--critical)">
+            Yes, Delete
+          </button>
+          <a href="{% url 'task_detail' task.pk %}" class="btn-outline-hangarin">Cancel</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
