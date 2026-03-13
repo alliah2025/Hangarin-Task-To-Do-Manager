@@ -37,17 +37,40 @@ def dashboard(request):
 
 def task_list(request):
     tasks = Task.objects.select_related('priority', 'category').order_by('-created_at')
-    status_filter = request.GET.get('status', '')
-    if status_filter:
-        tasks = tasks.filter(status=status_filter)
+    
     search = request.GET.get('search', '')
+    status_filter = request.GET.get('status', '')
+    category_filter = request.GET.get('category', '')
+    priority_filter = request.GET.get('priority', '')
+    sort = request.GET.get('sort', 'newest')
+
     if search:
         tasks = tasks.filter(title__icontains=search)
+    if status_filter:
+        tasks = tasks.filter(status=status_filter)
+    if category_filter:
+        tasks = tasks.filter(category_id=category_filter)
+    if priority_filter:
+        tasks = tasks.filter(priority_id=priority_filter)
+    if sort == 'oldest':
+        tasks = tasks.order_by('created_at')
+    elif sort == 'deadline':
+        tasks = tasks.order_by('deadline')
+    elif sort == 'title':
+        tasks = tasks.order_by('title')
+    else:
+        tasks = tasks.order_by('-created_at')
+
     context = {
         'tasks': tasks,
         'total_tasks': Task.objects.count(),
-        'status_filter': status_filter,
+        'categories': Category.objects.all(),
+        'priorities': Priority.objects.all(),
         'search': search,
+        'status_filter': status_filter,
+        'category_filter': category_filter,
+        'priority_filter': priority_filter,
+        'sort': sort,
     }
     return render(request, 'tasks/task_list.html', context)
 

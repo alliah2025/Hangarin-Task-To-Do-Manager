@@ -9,12 +9,73 @@
 
   <div class="h-card-header">
     <div class="h-card-title">Task List</div>
+    <span style="font-size:12px;color:var(--muted)">{{ tasks|length }} task{{ tasks|length|pluralize }}</span>
   </div>
 
-  <div class="p-3" style="border-bottom:1px solid var(--border);">
-    <form method="GET" action="{% url 'task_list' %}" class="d-flex gap-2">
-      <input type="text" name="search" value="{{ search }}" placeholder="Search tasks..." class="h-form-control" />
+  <!-- Search -->
+  <div class="p-3" style="border-bottom:1px solid var(--border)">
+    <form method="GET" class="d-flex gap-2">
+      <input type="text" name="search" value="{{ search }}" placeholder="Search tasks..." class="h-form-control">
+      <!-- preserve other filters when searching -->
+      {% if status_filter %}<input type="hidden" name="status" value="{{ status_filter }}">{% endif %}
+      {% if category_filter %}<input type="hidden" name="category" value="{{ category_filter }}">{% endif %}
+      {% if priority_filter %}<input type="hidden" name="priority" value="{{ priority_filter }}">{% endif %}
+      {% if sort != 'newest' %}<input type="hidden" name="sort" value="{{ sort }}">{% endif %}
       <button type="submit" class="btn-hangarin">Search</button>
+      {% if search %}
+      <a href="{% url 'task_list' %}" class="btn-outline-hangarin">Clear</a>
+      {% endif %}
+    </form>
+  </div>
+
+  <!-- Filters & Sort -->
+  <div class="p-3 d-flex gap-2 flex-wrap" style="border-bottom:1px solid var(--border)">
+    <form method="GET" class="d-flex gap-2 flex-wrap align-items-center">
+      {% if search %}<input type="hidden" name="search" value="{{ search }}">{% endif %}
+
+      <!-- Status -->
+      <select name="status" class="h-form-control" style="width:auto;min-width:130px">
+        <option value="">All Status</option>
+        <option value="Pending" {% if status_filter == 'Pending' %}selected{% endif %}>Pending</option>
+        <option value="In Progress" {% if status_filter == 'In Progress' %}selected{% endif %}>In Progress</option>
+        <option value="Completed" {% if status_filter == 'Completed' %}selected{% endif %}>Completed</option>
+      </select>
+
+      <!-- Category -->
+      <select name="category" class="h-form-control" style="width:auto;min-width:140px">
+        <option value="">All Categories</option>
+        {% for cat in categories %}
+        <option value="{{ cat.pk }}" {% if category_filter == cat.pk|stringformat:"s" %}selected{% endif %}>
+          {{ cat.name }}
+        </option>
+        {% endfor %}
+      </select>
+
+      <!-- Priority -->
+      <select name="priority" class="h-form-control" style="width:auto;min-width:130px">
+        <option value="">All Priorities</option>
+        {% for pri in priorities %}
+        <option value="{{ pri.pk }}" {% if priority_filter == pri.pk|stringformat:"s" %}selected{% endif %}>
+          {{ pri.name }}
+        </option>
+        {% endfor %}
+      </select>
+
+      <!-- Sort -->
+      <select name="sort" class="h-form-control" style="width:auto;min-width:140px">
+        <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest First</option>
+        <option value="oldest" {% if sort == 'oldest' %}selected{% endif %}>Oldest First</option>
+        <option value="deadline" {% if sort == 'deadline' %}selected{% endif %}>By Deadline</option>
+        <option value="title" {% if sort == 'title' %}selected{% endif %}>By Title (A-Z)</option>
+      </select>
+
+      <button type="submit" class="btn-hangarin" style="font-size:12px;padding:7px 16px">Filter</button>
+
+      {% if status_filter or category_filter or priority_filter or sort != 'newest' %}
+      <a href="{% url 'task_list' %}{% if search %}?search={{ search }}{% endif %}" 
+         class="btn-outline-hangarin" style="font-size:12px">Clear Filters</a>
+      {% endif %}
+
     </form>
   </div>
 
@@ -27,7 +88,7 @@
         <th>Status</th>
         <th>Priority</th>
         <th>Deadline</th>
-        <th style="width:90px;">Action</th>
+        <th style="width:120px">Action</th>
       </tr>
     </thead>
     <tbody>
@@ -40,12 +101,10 @@
             </a>
           </div>
           {% if task.description %}
-          <div style="font-size:11px;color:var(--muted);">
-            {{ task.description|truncatechars:60 }}
-          </div>
+          <div style="font-size:11px;color:var(--muted)">{{ task.description|truncatechars:60 }}</div>
           {% endif %}
         </td>
-        <td style="font-size:12px;color:var(--muted);">{{ task.category.name }}</td>
+        <td style="font-size:12px;color:var(--muted)">{{ task.category.name }}</td>
         <td>
           {% if task.status == "Completed" %}
             <span class="badge-done">Completed</span>
@@ -55,16 +114,16 @@
             <span class="badge-pending">Pending</span>
           {% endif %}
         </td>
-        <td style="font-size:12px;color:var(--muted);">
+        <td style="font-size:12px;color:var(--muted)">
           <span class="dot dot-{{ task.priority.name }}"></span>{{ task.priority.name }}
         </td>
-        <td style="font-size:12px;color:var(--muted);">
+        <td style="font-size:12px;color:var(--muted)">
           {% if task.deadline %}{{ task.deadline|date:"M d, Y" }}{% else %}—{% endif %}
         </td>
         <td>
           <div class="d-flex gap-2">
-            <a href="{% url 'task_detail' task.pk %}" class="btn-outline-hangarin" style="font-size:12px;padding:6px 10px;">View</a>
-            <a href="{% url 'task_edit' task.pk %}" class="btn-outline-hangarin" style="font-size:12px;padding:6px 10px;">Edit</a>
+            <a href="{% url 'task_detail' task.pk %}" class="btn-outline-hangarin" style="font-size:12px;padding:6px 10px">View</a>
+            <a href="{% url 'task_edit' task.pk %}" class="btn-outline-hangarin" style="font-size:12px;padding:6px 10px">Edit</a>
           </div>
         </td>
       </tr>
@@ -73,7 +132,14 @@
   </table>
 
   {% else %}
-  <div class="p-4 text-center" style="color:var(--muted);">No tasks found.</div>
+  <div class="p-4 text-center" style="color:var(--muted);font-size:13px">
+    No tasks found. 
+    {% if search or status_filter or category_filter or priority_filter %}
+      <a href="{% url 'task_list' %}" style="color:var(--accent)">Clear filters →</a>
+    {% else %}
+      <a href="{% url 'task_add' %}" style="color:var(--accent)">Add one</a>
+    {% endif %}
+  </div>
   {% endif %}
 
 </div>
