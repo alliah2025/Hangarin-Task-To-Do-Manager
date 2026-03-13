@@ -258,7 +258,10 @@ def subtask_confirm_delete(request, pk):
     })
 
 def category_list(request):
+    search = request.GET.get('search', '')
     categories = Category.objects.all()
+    if search:
+        categories = categories.filter(name__icontains=search)
     cat_data = []
     for cat in categories:
         total = Task.objects.filter(category=cat).count()
@@ -268,6 +271,7 @@ def category_list(request):
     return render(request, 'tasks/category_list.html', {
         'categories': cat_data,
         'total_tasks': Task.objects.count(),
+        'search': search,
     })
 
 def category_add(request):
@@ -280,8 +284,25 @@ def category_add(request):
         'total_tasks': Task.objects.count(),
     })
 
-def category_delete(request, pk):
+def category_edit(request, pk):
+    category = get_object_or_404(Category, pk=pk)
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        if name:
+            category.name = name
+            category.save()
+        return redirect('category_list')
+    return render(request, 'tasks/category_form.html', {
+        'category': category,
+        'total_tasks': Task.objects.count(),
+    })
+
+def category_confirm_delete(request, pk):
     category = get_object_or_404(Category, pk=pk)
     if request.method == 'POST':
         category.delete()
-    return redirect('category_list')
+        return redirect('category_list')
+    return render(request, 'tasks/category_confirm_delete.html', {
+        'category': category,
+        'total_tasks': Task.objects.count(),
+    })

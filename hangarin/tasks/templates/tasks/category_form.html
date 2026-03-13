@@ -1,0 +1,34 @@
+{% extends 'tasks/base.html' %}
+
+{% block title %}{% if category %}Edit Category{% else %}Add Category{% endif %}{% endblock %}
+{% block page_title %}{% if category %}Edit Category{% else %}Add Category{% endif %}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center fade-up">
+  <div class="col-lg-5">
+    <div class="h-card">
+      <div class="h-card-header">
+        <div class="h-card-title">{% if category %}Edit Category{% else %}Add Category{% endif %}</div>
+        <a href="{% url 'category_list' %}" class="btn-outline-hangarin" style="font-size:12px;padding:6px 12px">Back</a>
+      </div>
+      <div class="p-4">
+        <form method="POST">
+          {% csrf_token %}
+          <div class="h-form-group">
+            <label class="h-form-label">Category Name</label>
+            <input type="text" name="name" class="h-form-control"
+              value="{% if category %}{{ category.name }}{% endif %}"
+              placeholder="e.g. Health, Work, School..." required>
+          </div>
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn-hangarin">
+              {% if category %}Update Category{% else %}Save Category{% endif %}
+            </button>
+            <a href="{% url 'category_list' %}" class="btn-outline-hangarin">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
