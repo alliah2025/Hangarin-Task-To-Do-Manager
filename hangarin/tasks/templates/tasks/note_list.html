@@ -10,6 +10,31 @@
     <a href="{% url 'note_add' %}" class="btn-hangarin" style="font-size:12px;padding:6px 14px">+ Add Note</a>
   </div>
 
+  <!-- Filters -->
+  <div class="p-3 d-flex gap-2 flex-wrap" style="border-bottom:1px solid var(--border)">
+    <form method="GET" class="d-flex gap-2 flex-wrap">
+
+      <select name="task" class="h-form-control" style="width:auto;min-width:180px">
+        <option value="">All Tasks</option>
+        {% for task in tasks %}
+        <option value="{{ task.pk }}" {% if task_filter == task.pk|stringformat:"s" %}selected{% endif %}>
+          {{ task.title|truncatechars:40 }}
+        </option>
+        {% endfor %}
+      </select>
+
+      <select name="sort" class="h-form-control" style="width:auto">
+        <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest First</option>
+        <option value="oldest" {% if sort == 'oldest' %}selected{% endif %}>Oldest First</option>
+      </select>
+      <button type="submit" class="btn-hangarin" style="font-size:12px;padding:7px 16px">Sort</button>
+      {% if task_filter or sort != 'newest' %}
+      <a href="{% url 'note_list' %}" class="btn-outline-hangarin" style="font-size:12px">Clear</a>
+      {% endif %}
+
+    </form>
+  </div>
+
   {% if notes %}
   <table class="h-table">
     <thead>
@@ -24,7 +49,11 @@
       {% for note in notes %}
       <tr>
         <td style="font-size:13px;color:var(--text)">{{ note.content|truncatechars:80 }}</td>
-        <td style="font-size:12px;color:var(--muted)">{{ note.task.title }}</td>
+        <td>
+          <a href="{% url 'task_detail' note.task.pk %}" style="font-size:12px;color:var(--accent);text-decoration:none">
+            {{ note.task.title|truncatechars:40 }}
+          </a>
+        </td>
         <td style="font-size:12px;color:var(--muted)">{{ note.created_at|date:"M d, Y" }}</td>
         <td>
           <form method="POST" action="{% url 'note_delete' note.pk %}">
@@ -41,8 +70,9 @@
   </table>
   {% else %}
   <div class="p-4 text-center" style="color:var(--muted);font-size:13px">
-    No notes yet. <a href="{% url 'note_add' %}" style="color:var(--accent)">Add one →</a>
+    No notes found. <a href="{% url 'note_add' %}" style="color:var(--accent)">Add one →</a>
   </div>
   {% endif %}
+
 </div>
 {% endblock %}

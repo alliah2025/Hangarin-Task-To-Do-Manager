@@ -110,9 +110,24 @@ def task_delete(request, pk):
 
 def note_list(request):
     notes = Note.objects.select_related('task').order_by('-created_at')
+    tasks = Task.objects.all()
+
+    task_filter = request.GET.get('task', '')
+    sort = request.GET.get('sort', 'newest')
+
+    if task_filter:
+        notes = notes.filter(task_id=task_filter)
+    if sort == 'oldest':
+        notes = notes.order_by('created_at')
+    else:
+        notes = notes.order_by('-created_at')
+
     return render(request, 'tasks/note_list.html', {
         'notes': notes,
+        'tasks': tasks,
         'total_tasks': Task.objects.count(),
+        'task_filter': task_filter,
+        'sort': sort,
     })
 
 def note_add(request):
