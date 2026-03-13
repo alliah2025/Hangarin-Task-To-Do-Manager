@@ -163,6 +163,23 @@ def note_add(request):
         'total_tasks': Task.objects.count(),
     })
 
+def note_edit(request, pk):
+    note = get_object_or_404(Note, pk=pk)
+    tasks = Task.objects.all()
+    if request.method == 'POST':
+        task_id = request.POST.get('task')
+        content = request.POST.get('content')
+        if task_id and content:
+            note.task_id = task_id
+            note.content = content
+            note.save()
+        return redirect('note_list')
+    return render(request, 'tasks/note_form.html', {
+        'tasks': tasks,
+        'note': note,
+        'total_tasks': Task.objects.count(),
+    })
+
 def note_confirm_delete(request, pk):
     note = get_object_or_404(Note, pk=pk)
     if request.method == 'POST':
@@ -208,6 +225,25 @@ def subtask_add(request):
     tasks = Task.objects.all()
     return render(request, 'tasks/subtask_form.html', {
         'tasks': tasks,
+        'total_tasks': Task.objects.count(),
+    })
+
+def subtask_edit(request, pk):
+    subtask = get_object_or_404(SubTask, pk=pk)
+    tasks = Task.objects.all()
+    if request.method == 'POST':
+        task_id = request.POST.get('task')
+        title = request.POST.get('title')
+        status = request.POST.get('status', 'Pending')
+        if task_id and title:
+            subtask.parent_task_id = task_id
+            subtask.title = title
+            subtask.status = status
+            subtask.save()
+        return redirect('subtask_list')
+    return render(request, 'tasks/subtask_form.html', {
+        'tasks': tasks,
+        'subtask': subtask,
         'total_tasks': Task.objects.count(),
     })
 
