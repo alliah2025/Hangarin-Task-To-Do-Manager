@@ -1,0 +1,39 @@
+{% extends 'tasks/base.html' %}
+
+{% block title %}Add Note{% endblock %}
+{% block page_title %}Add Note{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center fade-up">
+  <div class="col-lg-6">
+    <div class="h-card">
+      <div class="h-card-header">
+        <div class="h-card-title">Add Note</div>
+        <a href="{% url 'note_list' %}" class="btn-outline-hangarin" style="font-size:12px;padding:6px 12px">Back</a>
+      </div>
+      <div class="p-4">
+        <form method="POST">
+          {% csrf_token %}
+          <div class="h-form-group">
+            <label class="h-form-label">Task</label>
+            <select name="task" class="h-form-control" required>
+              <option value="">Select a task...</option>
+              {% for task in tasks %}
+              <option value="{{ task.pk }}">{{ task.title }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="h-form-group">
+            <label class="h-form-label">Content</label>
+            <textarea name="content" class="h-form-control" rows="4" placeholder="Write your note..." required></textarea>
+          </div>
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn-hangarin">Save Note</button>
+            <a href="{% url 'note_list' %}" class="btn-outline-hangarin">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
