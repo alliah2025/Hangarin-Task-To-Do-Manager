@@ -1,0 +1,56 @@
+{% extends 'tasks/base.html' %}
+
+{% block title %}Subtasks{% endblock %}
+{% block page_title %}Subtasks{% endblock %}
+
+{% block content %}
+<div class="h-card fade-up">
+  <div class="h-card-header">
+    <div class="h-card-title">All Subtasks</div>
+    <a href="{% url 'subtask_add' %}" class="btn-hangarin" style="font-size:12px;padding:6px 14px">+ Add Subtask</a>
+  </div>
+
+  {% if subtasks %}
+  <table class="h-table">
+    <thead>
+      <tr>
+        <th>Subtask</th>
+        <th>Parent Task</th>
+        <th>Status</th>
+        <th style="width:80px">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for sub in subtasks %}
+      <tr>
+        <td style="font-size:13px;font-weight:500;color:var(--text)">{{ sub.title }}</td>
+        <td style="font-size:12px;color:var(--muted)">{{ sub.parent_task.title }}</td>
+        <td>
+          {% if sub.status == "Completed" %}
+            <span class="badge-done">Completed</span>
+          {% elif sub.status == "In Progress" %}
+            <span class="badge-progress">In Progress</span>
+          {% else %}
+            <span class="badge-pending">Pending</span>
+          {% endif %}
+        </td>
+        <td>
+          <form method="POST" action="{% url 'subtask_delete' sub.pk %}">
+            {% csrf_token %}
+            <button type="submit" onclick="return confirm('Delete this subtask?')"
+              style="background:none;border:1px solid var(--critical);color:var(--critical);padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;">
+              Delete
+            </button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="p-4 text-center" style="color:var(--muted);font-size:13px">
+    No subtasks yet. <a href="{% url 'subtask_add' %}" style="color:var(--accent)">Add one →</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

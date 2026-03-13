@@ -1,0 +1,47 @@
+{% extends 'tasks/base.html' %}
+
+{% block title %}Add Subtask{% endblock %}
+{% block page_title %}Add Subtask{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center fade-up">
+  <div class="col-lg-6">
+    <div class="h-card">
+      <div class="h-card-header">
+        <div class="h-card-title">Add Subtask</div>
+        <a href="{% url 'subtask_list' %}" class="btn-outline-hangarin" style="font-size:12px;padding:6px 12px">← Back</a>
+      </div>
+      <div class="p-4">
+        <form method="POST">
+          {% csrf_token %}
+          <div class="h-form-group">
+            <label class="h-form-label">Parent Task</label>
+            <select name="task" class="h-form-control" required>
+              <option value="">Select a task...</option>
+              {% for task in tasks %}
+              <option value="{{ task.pk }}">{{ task.title }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="h-form-group">
+            <label class="h-form-label">Title</label>
+            <input type="text" name="title" class="h-form-control" placeholder="Subtask title..." required>
+          </div>
+          <div class="h-form-group">
+            <label class="h-form-label">Status</label>
+            <select name="status" class="h-form-control">
+              <option value="Pending">Pending</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Completed">Completed</option>
+            </select>
+          </div>
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn-hangarin">Save Subtask</button>
+            <a href="{% url 'subtask_list' %}" class="btn-outline-hangarin">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
