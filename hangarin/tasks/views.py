@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
-from .models import Task, Category, Priority
+from .models import Task, Category, Priority, Note, SubTask
 from .forms import TaskForm
 
 
@@ -107,3 +107,85 @@ def task_delete(request, pk):
         'total_tasks': Task.objects.count(),
     }
     return render(request, 'tasks/task_confirm_delete.html', context)
+
+def note_list(request):
+    notes = Note.objects.select_related('task').order_by('-created_at')
+    return render(request, 'tasks/note_list.html', {
+        'notes': notes,
+        'total_tasks': Task.objects.count(),
+    })
+
+def note_add(request):
+    if request.method == 'POST':
+        task_id = request.POST.get('task')
+        content = request.POST.get('content')
+        if task_id and content:
+            Note.objects.create(task_id=task_id, content=content)
+        return redirect('note_list')
+    tasks = Task.objects.all()
+    return render(request, 'tasks/note_form.html', {
+        'tasks': tasks,
+        'total_tasks': Task.objects.count(),
+    })
+
+def note_delete(request, pk):
+    note = get_object_or_404(Note, pk=pk)
+    if request.method == 'POST':
+        note.delete()
+    return redirect('note_list')
+
+def subtask_list(request):
+    subtasks = SubTask.objects.select_related('parent_task').order_by('-id')
+    return render(request, 'tasks/subtask_list.html', {
+        'subtasks': subtasks,
+        'total_tasks': Task.objects.count(),
+    })
+
+def subtask_add(request):
+    if request.method == 'POST':
+        task_id = request.POST.get('task')
+        title = request.POST.get('title')
+        status = request.POST.get('status', 'Pending')
+        if task_id and title:
+            SubTask.objects.create(parent_task_id=task_id, title=title, status=status)
+        return redirect('subtask_list')
+    tasks = Task.objects.all()
+    return render(request, 'tasks/subtask_form.html', {
+        'tasks': tasks,
+        'total_tasks': Task.objects.count(),
+    })
+
+def subtask_delete(request, pk):
+    subtask = get_object_or_404(SubTask, pk=pk)
+    if request.method == 'POST':
+        subtask.delete()
+    return redirect('subtask_list')
+
+def category_list(request):
+    categories = Category.objects.all()
+    cat_data = []
+    for cat in categories:
+        total = Task.objects.filter(category=cat).count()
+        done = Task.objects.filter(category=cat, status='Completed').count()
+        percent = round((done / total) * 100) if total > 0 else 0
+        cat_data.append({'obj': cat, 'total': total, 'done': done, 'percent': percent})
+    return render(request, 'tasks/category_list.html', {
+        'categories': cat_data,
+        'total_tasks': Task.objects.count(),
+    })
+
+def category_add(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        if name:
+            Category.objects.create(name=name)
+        return redirect('category_list')
+    return render(request, 'tasks/category_form.html', {
+        'total_tasks': Task.objects.count(),
+    })
+
+def category_delete(request, pk):
+    category = get_object_or_404(Category, pk=pk)
+    if request.method == 'POST':
+        category.delete()
+    return redirect('category_list')
