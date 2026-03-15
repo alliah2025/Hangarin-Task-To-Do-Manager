@@ -26,4 +26,11 @@ urlpatterns = [
     path('categories/add/', views.category_add, name='category_add'),
     path('categories/<int:pk>/edit/', views.category_edit, name='category_edit'),
     path('categories/<int:pk>/confirm-delete/', views.category_confirm_delete, name='category_confirm_delete'),
+
+    # Priorities
+    path('priorities/', views.priority_list, name='priority_list'),
+    path('priorities/add/', views.priority_add, name='priority_add'),
+    path('priorities/<int:pk>/edit/', views.priority_edit, name='priority_edit'),
+    path('priorities/<int:pk>/confirm-delete/', views.priority_confirm_delete, name='priority_confirm_delete'),
 ]
+

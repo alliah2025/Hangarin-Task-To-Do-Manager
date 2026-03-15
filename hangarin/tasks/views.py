@@ -136,18 +136,24 @@ def note_list(request):
     tasks = Task.objects.all()
     task_filter = request.GET.get('task', '')
     sort = request.GET.get('sort', 'newest')
+    search = request.GET.get('search', '')
+
+    if search:
+        notes = notes.filter(content__icontains=search)
     if task_filter:
         notes = notes.filter(task_id=task_filter)
     if sort == 'oldest':
         notes = notes.order_by('created_at')
     else:
         notes = notes.order_by('-created_at')
+
     return render(request, 'tasks/note_list.html', {
         'notes': notes,
         'tasks': tasks,
         'total_tasks': Task.objects.count(),
         'task_filter': task_filter,
         'sort': sort,
+        'search': search,
     })
 
 def note_add(request):
@@ -304,5 +310,55 @@ def category_confirm_delete(request, pk):
         return redirect('category_list')
     return render(request, 'tasks/category_confirm_delete.html', {
         'category': category,
+        'total_tasks': Task.objects.count(),
+    })
+
+def priority_list(request):
+    search = request.GET.get('search', '')
+    priorities = Priority.objects.all()
+    if search:
+        priorities = priorities.filter(name__icontains=search)
+    pri_data = []
+    for pri in priorities:
+        total = Task.objects.filter(priority=pri).count()
+        done = Task.objects.filter(priority=pri, status='Completed').count()
+        percent = round((done / total) * 100) if total > 0 else 0
+        pri_data.append({'obj': pri, 'total': total, 'done': done, 'percent': percent})
+    return render(request, 'tasks/priority_list.html', {
+        'priorities': pri_data,
+        'total_tasks': Task.objects.count(),
+        'search': search,
+    })
+
+def priority_add(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        if name:
+            Priority.objects.create(name=name)
+        return redirect('priority_list')
+    return render(request, 'tasks/priority_form.html', {
+        'total_tasks': Task.objects.count(),
+    })
+
+def priority_edit(request, pk):
+    priority = get_object_or_404(Priority, pk=pk)
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        if name:
+            priority.name = name
+            priority.save()
+        return redirect('priority_list')
+    return render(request, 'tasks/priority_form.html', {
+        'priority': priority,
+        'total_tasks': Task.objects.count(),
+    })
+
+def priority_confirm_delete(request, pk):
+    priority = get_object_or_404(Priority, pk=pk)
+    if request.method == 'POST':
+        priority.delete()
+        return redirect('priority_list')
+    return render(request, 'tasks/priority_confirm_delete.html', {
+        'priority': priority,
         'total_tasks': Task.objects.count(),
     })
