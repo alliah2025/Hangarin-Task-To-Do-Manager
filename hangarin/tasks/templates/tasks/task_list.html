@@ -12,28 +12,22 @@
     <span style="font-size:12px;color:var(--muted)">{{ tasks|length }} task{{ tasks|length|pluralize }}</span>
   </div>
 
-  <!-- Search -->
   <div class="p-3" style="border-bottom:1px solid var(--border)">
     <form method="GET" class="d-flex gap-2">
       <input type="text" name="search" value="{{ search }}" placeholder="Search tasks..." class="h-form-control">
-      <!-- preserve other filters when searching -->
       {% if status_filter %}<input type="hidden" name="status" value="{{ status_filter }}">{% endif %}
       {% if category_filter %}<input type="hidden" name="category" value="{{ category_filter }}">{% endif %}
       {% if priority_filter %}<input type="hidden" name="priority" value="{{ priority_filter }}">{% endif %}
-      {% if sort != 'newest' %}<input type="hidden" name="sort" value="{{ sort }}">{% endif %}
       <button type="submit" class="btn-hangarin">Search</button>
       {% if search %}
       <a href="{% url 'task_list' %}" class="btn-outline-hangarin">Clear</a>
       {% endif %}
     </form>
   </div>
-
-  <!-- Filters & Sort -->
   <div class="p-3 d-flex gap-2 flex-wrap" style="border-bottom:1px solid var(--border)">
     <form method="GET" class="d-flex gap-2 flex-wrap align-items-center">
       {% if search %}<input type="hidden" name="search" value="{{ search }}">{% endif %}
 
-      <!-- Status -->
       <select name="status" class="h-form-control" style="width:auto;min-width:130px">
         <option value="">All Status</option>
         <option value="Pending" {% if status_filter == 'Pending' %}selected{% endif %}>Pending</option>
@@ -41,7 +35,6 @@
         <option value="Completed" {% if status_filter == 'Completed' %}selected{% endif %}>Completed</option>
       </select>
 
-      <!-- Category -->
       <select name="category" class="h-form-control" style="width:auto;min-width:140px">
         <option value="">All Categories</option>
         {% for cat in categories %}
@@ -51,7 +44,6 @@
         {% endfor %}
       </select>
 
-      <!-- Priority -->
       <select name="priority" class="h-form-control" style="width:auto;min-width:130px">
         <option value="">All Priorities</option>
         {% for pri in priorities %}
@@ -61,21 +53,12 @@
         {% endfor %}
       </select>
 
-      <!-- Sort -->
-      <select name="sort" class="h-form-control" style="width:auto;min-width:140px">
-        <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest First</option>
-        <option value="oldest" {% if sort == 'oldest' %}selected{% endif %}>Oldest First</option>
-        <option value="deadline" {% if sort == 'deadline' %}selected{% endif %}>By Deadline</option>
-        <option value="title" {% if sort == 'title' %}selected{% endif %}>By Title (A-Z)</option>
-      </select>
-
       <button type="submit" class="btn-hangarin" style="font-size:12px;padding:7px 16px">Filter</button>
 
-      {% if status_filter or category_filter or priority_filter or sort != 'newest' %}
-      <a href="{% url 'task_list' %}{% if search %}?search={{ search }}{% endif %}" 
+      {% if status_filter or category_filter or priority_filter %}
+      <a href="{% url 'task_list' %}{% if search %}?search={{ search }}{% endif %}"
          class="btn-outline-hangarin" style="font-size:12px">Clear Filters</a>
       {% endif %}
-
     </form>
   </div>
 
@@ -133,11 +116,11 @@
 
   {% else %}
   <div class="p-4 text-center" style="color:var(--muted);font-size:13px">
-    No tasks found. 
+    No tasks found.
     {% if search or status_filter or category_filter or priority_filter %}
       <a href="{% url 'task_list' %}" style="color:var(--accent)">Clear filters →</a>
     {% else %}
-      <a href="{% url 'task_add' %}" style="color:var(--accent)">Add one</a>
+      <a href="{% url 'task_add' %}" style="color:var(--accent)">Add one →</a>
     {% endif %}
   </div>
   {% endif %}

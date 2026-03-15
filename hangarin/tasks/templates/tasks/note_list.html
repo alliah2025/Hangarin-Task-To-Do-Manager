@@ -9,23 +9,18 @@
     <div class="h-card-title">All Notes</div>
     <a href="{% url 'note_add' %}" class="btn-hangarin" style="font-size:12px;padding:6px 14px">+ Add Note</a>
   </div>
-
-  <!-- Search -->
   <div class="p-3" style="border-bottom:1px solid var(--border)">
     <form method="GET" class="d-flex gap-2">
       <input type="text" name="search" value="{{ search }}" placeholder="Search note content..." class="h-form-control">
       {% if task_filter %}<input type="hidden" name="task" value="{{ task_filter }}">{% endif %}
-      {% if sort != 'newest' %}<input type="hidden" name="sort" value="{{ sort }}">{% endif %}
       <button type="submit" class="btn-hangarin">Search</button>
       {% if search %}
       <a href="{% url 'note_list' %}" class="btn-outline-hangarin">Clear</a>
       {% endif %}
     </form>
   </div>
-
-  <!-- Filter & Sort -->
   <div class="p-3 d-flex gap-2 flex-wrap" style="border-bottom:1px solid var(--border)">
-    <form method="GET" class="d-flex gap-2 flex-wrap">
+    <form method="GET" class="d-flex gap-2 flex-wrap align-items-center">
       {% if search %}<input type="hidden" name="search" value="{{ search }}">{% endif %}
 
       <select name="task" class="h-form-control" style="width:auto;min-width:180px">
@@ -37,16 +32,11 @@
         {% endfor %}
       </select>
 
-      <select name="sort" class="h-form-control" style="width:auto">
-        <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest First</option>
-        <option value="oldest" {% if sort == 'oldest' %}selected{% endif %}>Oldest First</option>
-      </select>
+      <button type="submit" class="btn-hangarin" style="font-size:12px;padding:7px 16px">Filter</button>
 
-      <button type="submit" class="btn-hangarin" style="font-size:12px;padding:7px 16px">Sort</button>
-
-      {% if task_filter or sort != 'newest' %}
-      <a href="{% url 'note_list' %}{% if search %}?search={{ search }}{% endif %}" 
-         class="btn-outline-hangarin" style="font-size:12px">Clear Filters</a>
+      {% if task_filter %}
+      <a href="{% url 'note_list' %}{% if search %}?search={{ search }}{% endif %}"
+         class="btn-outline-hangarin" style="font-size:12px">Clear Filter</a>
       {% endif %}
     </form>
   </div>

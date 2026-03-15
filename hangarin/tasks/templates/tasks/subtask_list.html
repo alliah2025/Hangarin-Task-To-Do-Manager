@@ -9,24 +9,19 @@
     <div class="h-card-title">All Subtasks</div>
     <a href="{% url 'subtask_add' %}" class="btn-hangarin" style="font-size:12px;padding:6px 14px">+ Add Subtask</a>
   </div>
-
-  <!-- Search -->
   <div class="p-3" style="border-bottom:1px solid var(--border)">
     <form method="GET" class="d-flex gap-2">
       <input type="text" name="search" value="{{ search }}" placeholder="Search subtasks..." class="h-form-control">
+      {% if task_filter %}<input type="hidden" name="task" value="{{ task_filter }}">{% endif %}
       <button type="submit" class="btn-hangarin">Search</button>
       {% if search %}
       <a href="{% url 'subtask_list' %}" class="btn-outline-hangarin">Clear</a>
       {% endif %}
     </form>
   </div>
-
-  <!-- Sort & Filter -->
   <div class="p-3 d-flex gap-2 flex-wrap" style="border-bottom:1px solid var(--border)">
-    <form method="GET" class="d-flex gap-2 flex-wrap">
-      {% if search %}
-      <input type="hidden" name="search" value="{{ search }}">
-      {% endif %}
+    <form method="GET" class="d-flex gap-2 flex-wrap align-items-center">
+      {% if search %}<input type="hidden" name="search" value="{{ search }}">{% endif %}
 
       <select name="task" class="h-form-control" style="width:auto;min-width:180px">
         <option value="">All Tasks</option>
@@ -37,15 +32,11 @@
         {% endfor %}
       </select>
 
-      <select name="sort" class="h-form-control" style="width:auto">
-        <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest First</option>
-        <option value="oldest" {% if sort == 'oldest' %}selected{% endif %}>Oldest First</option>
-      </select>
+      <button type="submit" class="btn-hangarin" style="font-size:12px;padding:7px 16px">Filter</button>
 
-      <button type="submit" class="btn-hangarin" style="font-size:12px;padding:7px 16px">Sort</button>
-
-      {% if task_filter or sort != 'newest' %}
-      <a href="{% url 'subtask_list' %}" class="btn-outline-hangarin" style="font-size:12px">Clear</a>
+      {% if task_filter %}
+      <a href="{% url 'subtask_list' %}{% if search %}?search={{ search }}{% endif %}"
+         class="btn-outline-hangarin" style="font-size:12px">Clear Filter</a>
       {% endif %}
     </form>
   </div>
@@ -57,7 +48,7 @@
         <th>Subtask</th>
         <th>Parent Task</th>
         <th>Status</th>
-        <th style="width:80px">Action</th>
+        <th style="width:100px">Action</th>
       </tr>
     </thead>
     <tbody>
@@ -78,32 +69,36 @@
             <span class="badge-pending">Pending</span>
           {% endif %}
         </td>
-          <td>
-            <div class="d-flex gap-2">
-              <a href="{% url 'subtask_edit' sub.pk %}" 
-                style="border:1px solid var(--border);color:var(--text);padding:4px 10px;border-radius:6px;font-size:11px;text-decoration:none;">
-                Edit
-              </a>
-              <a href="{% url 'subtask_confirm_delete' sub.pk %}" title="Delete"
-                style="color:var(--critical);text-decoration:none;display:flex;align-items:center;padding:4px 6px;">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="3 6 5 6 21 6"/>
-                  <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>
-                  <path d="M10 11v6M14 11v6"/>
-                  <path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/>
-                </svg>
-              </a>
-            </div>
-          </td>
-              </tr>
+        <td>
+          <div class="d-flex gap-2 align-items-center">
+            <a href="{% url 'subtask_edit' sub.pk %}"
+               style="border:1px solid var(--border);color:var(--text);padding:4px 10px;border-radius:6px;font-size:11px;text-decoration:none;">
+              Edit
+            </a>
+            <a href="{% url 'subtask_confirm_delete' sub.pk %}" title="Delete"
+               style="color:var(--critical);text-decoration:none;display:flex;align-items:center;padding:4px 6px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>
+                <path d="M10 11v6M14 11v6"/>
+                <path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/>
+              </svg>
+            </a>
+          </div>
+        </td>
+      </tr>
       {% endfor %}
     </tbody>
   </table>
   {% else %}
   <div class="p-4 text-center" style="color:var(--muted);font-size:13px">
-    No subtasks found. <a href="{% url 'subtask_add' %}" style="color:var(--accent)">Add one</a>
+    No subtasks found.
+    {% if search or task_filter %}
+      <a href="{% url 'subtask_list' %}" style="color:var(--accent)">Clear filters →</a>
+    {% else %}
+      <a href="{% url 'subtask_add' %}" style="color:var(--accent)">Add one →</a>
+    {% endif %}
   </div>
   {% endif %}
-
 </div>
 {% endblock %}

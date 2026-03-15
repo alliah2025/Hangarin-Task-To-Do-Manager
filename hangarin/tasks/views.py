@@ -42,7 +42,6 @@ def task_list(request):
     status_filter = request.GET.get('status', '')
     category_filter = request.GET.get('category', '')
     priority_filter = request.GET.get('priority', '')
-    sort = request.GET.get('sort', 'newest')
 
     if search:
         tasks = tasks.filter(title__icontains=search)
@@ -52,14 +51,6 @@ def task_list(request):
         tasks = tasks.filter(category_id=category_filter)
     if priority_filter:
         tasks = tasks.filter(priority_id=priority_filter)
-    if sort == 'oldest':
-        tasks = tasks.order_by('created_at')
-    elif sort == 'deadline':
-        tasks = tasks.order_by('deadline')
-    elif sort == 'title':
-        tasks = tasks.order_by('title')
-    else:
-        tasks = tasks.order_by('-created_at')
 
     context = {
         'tasks': tasks,
@@ -70,7 +61,6 @@ def task_list(request):
         'status_filter': status_filter,
         'category_filter': category_filter,
         'priority_filter': priority_filter,
-        'sort': sort,
     }
     return render(request, 'tasks/task_list.html', context)
 
@@ -134,26 +124,18 @@ def task_delete(request, pk):
 def note_list(request):
     notes = Note.objects.select_related('task').order_by('-created_at')
     tasks = Task.objects.all()
-    task_filter = request.GET.get('task', '')
-    sort = request.GET.get('sort', 'newest')
     search = request.GET.get('search', '')
-
+    task_filter = request.GET.get('task', '')
     if search:
         notes = notes.filter(content__icontains=search)
     if task_filter:
         notes = notes.filter(task_id=task_filter)
-    if sort == 'oldest':
-        notes = notes.order_by('created_at')
-    else:
-        notes = notes.order_by('-created_at')
-
     return render(request, 'tasks/note_list.html', {
         'notes': notes,
         'tasks': tasks,
         'total_tasks': Task.objects.count(),
-        'task_filter': task_filter,
-        'sort': sort,
         'search': search,
+        'task_filter': task_filter,
     })
 
 def note_add(request):
@@ -201,22 +183,16 @@ def subtask_list(request):
     subtasks = SubTask.objects.select_related('parent_task').order_by('-id')
     tasks = Task.objects.all()
     task_filter = request.GET.get('task', '')
-    sort = request.GET.get('sort', 'newest')
     search = request.GET.get('search', '')
     if task_filter:
         subtasks = subtasks.filter(parent_task_id=task_filter)
     if search:
         subtasks = subtasks.filter(title__icontains=search)
-    if sort == 'oldest':
-        subtasks = subtasks.order_by('id')
-    else:
-        subtasks = subtasks.order_by('-id')
     return render(request, 'tasks/subtask_list.html', {
         'subtasks': subtasks,
         'tasks': tasks,
         'total_tasks': Task.objects.count(),
         'task_filter': task_filter,
-        'sort': sort,
         'search': search,
     })
 

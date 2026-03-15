@@ -15,7 +15,8 @@
 
   <aside class="sidebar">
     <div class="sidebar-logo">
-      <div class="logo-icon">H</div>
+      <img src="{% static 'img/logo.png' %}" alt="Hangarin Logo" 
+          style="width:38px;height:38px;object-fit:contain;flex-shrink:0;">
       <div>
         <div class="logo-text">Hangarin</div>
         <div class="logo-sub">Task Manager</div>
@@ -51,17 +52,12 @@
           <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
           Priorities
         </a>
-
-      <div class="nav-section-label">Account</div>
-      <a href="/admin/" class="sidebar-link">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 10-16 0"/></svg>
-        Admin Panel
-      </a>
     </nav>
 
     <div class="sidebar-footer">
       <div class="user-card">
-        <div class="user-avatar">{{ request.user.username|first|upper }}</div>
+        <img src="{% static 'img/profile.png' %}" alt="Profile"
+            style="width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0;">
         <div>
           <div class="user-name">{{ request.user.username }}</div>
           <div class="user-role">Administrator</div>
