@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from .models import Task, Category, Priority, Note, SubTask
 from .forms import TaskForm
-
+from django.db.models import Q
 
 def dashboard(request):
     tasks = Task.objects.select_related('priority', 'category').order_by('-created_at')[:10]
@@ -37,14 +37,15 @@ def dashboard(request):
 
 def task_list(request):
     tasks = Task.objects.select_related('priority', 'category').order_by('-created_at')
-    
     search = request.GET.get('search', '')
     status_filter = request.GET.get('status', '')
     category_filter = request.GET.get('category', '')
     priority_filter = request.GET.get('priority', '')
 
     if search:
-        tasks = tasks.filter(title__icontains=search)
+        tasks = tasks.filter(
+            Q(title__icontains=search) | Q(description__icontains=search)
+        )
     if status_filter:
         tasks = tasks.filter(status=status_filter)
     if category_filter:
@@ -126,16 +127,22 @@ def note_list(request):
     tasks = Task.objects.all()
     search = request.GET.get('search', '')
     task_filter = request.GET.get('task', '')
+    date_filter = request.GET.get('date', '')
+
     if search:
         notes = notes.filter(content__icontains=search)
     if task_filter:
         notes = notes.filter(task_id=task_filter)
+    if date_filter:
+        notes = notes.filter(created_at__date=date_filter)
+
     return render(request, 'tasks/note_list.html', {
         'notes': notes,
         'tasks': tasks,
         'total_tasks': Task.objects.count(),
         'search': search,
         'task_filter': task_filter,
+        'date_filter': date_filter,
     })
 
 def note_add(request):
@@ -183,16 +190,22 @@ def subtask_list(request):
     subtasks = SubTask.objects.select_related('parent_task').order_by('-id')
     tasks = Task.objects.all()
     task_filter = request.GET.get('task', '')
+    status_filter = request.GET.get('status', '')
     search = request.GET.get('search', '')
+
     if task_filter:
         subtasks = subtasks.filter(parent_task_id=task_filter)
+    if status_filter:
+        subtasks = subtasks.filter(status=status_filter)
     if search:
         subtasks = subtasks.filter(title__icontains=search)
+
     return render(request, 'tasks/subtask_list.html', {
         'subtasks': subtasks,
         'tasks': tasks,
         'total_tasks': Task.objects.count(),
         'task_filter': task_filter,
+        'status_filter': status_filter,
         'search': search,
     })
 

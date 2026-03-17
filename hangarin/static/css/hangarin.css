@@ -350,3 +350,60 @@ textarea.h-form-control { resize: vertical; min-height: 100px; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
+
+/* ---- HAMBURGER BUTTON ---- */
+.hamburger-btn {
+  display: none;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 10px;
+  cursor: pointer;
+  color: var(--text);
+  margin-right: 4px;
+}
+
+/* ---- SIDEBAR OVERLAY ---- */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 999;
+}
+
+.sidebar-overlay.active { display: block; }
+
+@media (max-width: 768px) {
+  .hamburger-btn { display: flex; align-items: center; }
+
+  .sidebar {
+    position: fixed;
+    left: -255px;
+    transition: left 0.25s ease;
+    z-index: 1000;
+  }
+
+  .sidebar.open { left: 0; }
+
+  .main-wrapper {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .topbar { padding: 0 14px; gap: 8px; }
+  .topbar-title { font-size: 14px; }
+
+  .btn-hangarin span { display: none; }
+  .btn-hangarin { padding: 8px 10px; }
+
+  .theme-toggle-btn span:last-child { display: none; }
+  .theme-toggle-btn { padding: 7px 10px; }
+
+  .stat-value { font-size: 26px; }
+
+  .h-table th, .h-table td {
+    padding: 10px 10px;
+    font-size: 11px;
+  }
+}

@@ -12,7 +12,7 @@
 <body>
 
 <div class="d-flex">
-
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
   <aside class="sidebar">
     <div class="sidebar-logo">
       <img src="{% static 'img/logo.png' %}" alt="Hangarin Logo" 
@@ -69,6 +69,13 @@
 
   <div class="main-wrapper">
     <header class="topbar">
+      <button class="hamburger-btn" onclick="toggleSidebar()" id="hamburgerBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
       <div class="topbar-title">{% block page_title %}Dashboard{% endblock %}</div>
       <button class="theme-toggle-btn" onclick="toggleTheme()">
         <span id="themeIcon">🌙</span>
@@ -98,6 +105,26 @@
     document.getElementById('themeIcon').textContent = isLight ? '☀️' : '🌙';
     localStorage.setItem('theme', isLight ? 'light' : 'dark');
   }
+  if (localStorage.getItem('theme') === 'light') {
+    document.body.classList.add('light-mode');
+    document.getElementById('themeLabel').textContent = 'Dark Mode';
+    document.getElementById('themeIcon').textContent = '☀️';
+  }
+  function toggleSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('active');
+  }
+
+  function toggleTheme() {
+    document.body.classList.toggle('light-mode');
+    const isLight = document.body.classList.contains('light-mode');
+    document.getElementById('themeLabel').textContent = isLight ? 'Dark Mode' : 'Light Mode';
+    document.getElementById('themeIcon').textContent = isLight ? '☀️' : '🌙';
+    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+  }
+
   if (localStorage.getItem('theme') === 'light') {
     document.body.classList.add('light-mode');
     document.getElementById('themeLabel').textContent = 'Dark Mode';

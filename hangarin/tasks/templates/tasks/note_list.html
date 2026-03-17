@@ -9,16 +9,21 @@
     <div class="h-card-title">All Notes</div>
     <a href="{% url 'note_add' %}" class="btn-hangarin" style="font-size:12px;padding:6px 14px">+ Add Note</a>
   </div>
+
+  <!-- Search -->
   <div class="p-3" style="border-bottom:1px solid var(--border)">
     <form method="GET" class="d-flex gap-2">
       <input type="text" name="search" value="{{ search }}" placeholder="Search note content..." class="h-form-control">
       {% if task_filter %}<input type="hidden" name="task" value="{{ task_filter }}">{% endif %}
+      {% if date_filter %}<input type="hidden" name="date" value="{{ date_filter }}">{% endif %}
       <button type="submit" class="btn-hangarin">Search</button>
       {% if search %}
       <a href="{% url 'note_list' %}" class="btn-outline-hangarin">Clear</a>
       {% endif %}
     </form>
   </div>
+
+  <!-- Filters -->
   <div class="p-3 d-flex gap-2 flex-wrap" style="border-bottom:1px solid var(--border)">
     <form method="GET" class="d-flex gap-2 flex-wrap align-items-center">
       {% if search %}<input type="hidden" name="search" value="{{ search }}">{% endif %}
@@ -32,11 +37,13 @@
         {% endfor %}
       </select>
 
+      <input type="date" name="date" value="{{ date_filter }}" class="h-form-control" style="width:auto">
+
       <button type="submit" class="btn-hangarin" style="font-size:12px;padding:7px 16px">Filter</button>
 
-      {% if task_filter %}
+      {% if task_filter or date_filter %}
       <a href="{% url 'note_list' %}{% if search %}?search={{ search }}{% endif %}"
-         class="btn-outline-hangarin" style="font-size:12px">Clear Filter</a>
+         class="btn-outline-hangarin" style="font-size:12px">Clear Filters</a>
       {% endif %}
     </form>
   </div>
@@ -85,7 +92,7 @@
   {% else %}
   <div class="p-4 text-center" style="color:var(--muted);font-size:13px">
     No notes found.
-    {% if search or task_filter %}
+    {% if search or task_filter or date_filter %}
       <a href="{% url 'note_list' %}" style="color:var(--accent)">Clear filters →</a>
     {% else %}
       <a href="{% url 'note_add' %}" style="color:var(--accent)">Add one →</a>

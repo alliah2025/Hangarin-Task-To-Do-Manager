@@ -9,16 +9,21 @@
     <div class="h-card-title">All Subtasks</div>
     <a href="{% url 'subtask_add' %}" class="btn-hangarin" style="font-size:12px;padding:6px 14px">+ Add Subtask</a>
   </div>
+
+  <!-- Search -->
   <div class="p-3" style="border-bottom:1px solid var(--border)">
     <form method="GET" class="d-flex gap-2">
       <input type="text" name="search" value="{{ search }}" placeholder="Search subtasks..." class="h-form-control">
       {% if task_filter %}<input type="hidden" name="task" value="{{ task_filter }}">{% endif %}
+      {% if status_filter %}<input type="hidden" name="status" value="{{ status_filter }}">{% endif %}
       <button type="submit" class="btn-hangarin">Search</button>
       {% if search %}
       <a href="{% url 'subtask_list' %}" class="btn-outline-hangarin">Clear</a>
       {% endif %}
     </form>
   </div>
+
+  <!-- Filters -->
   <div class="p-3 d-flex gap-2 flex-wrap" style="border-bottom:1px solid var(--border)">
     <form method="GET" class="d-flex gap-2 flex-wrap align-items-center">
       {% if search %}<input type="hidden" name="search" value="{{ search }}">{% endif %}
@@ -32,11 +37,18 @@
         {% endfor %}
       </select>
 
+      <select name="status" class="h-form-control" style="width:auto;min-width:130px">
+        <option value="">All Status</option>
+        <option value="Pending" {% if status_filter == 'Pending' %}selected{% endif %}>Pending</option>
+        <option value="In Progress" {% if status_filter == 'In Progress' %}selected{% endif %}>In Progress</option>
+        <option value="Completed" {% if status_filter == 'Completed' %}selected{% endif %}>Completed</option>
+      </select>
+
       <button type="submit" class="btn-hangarin" style="font-size:12px;padding:7px 16px">Filter</button>
 
-      {% if task_filter %}
+      {% if task_filter or status_filter %}
       <a href="{% url 'subtask_list' %}{% if search %}?search={{ search }}{% endif %}"
-         class="btn-outline-hangarin" style="font-size:12px">Clear Filter</a>
+         class="btn-outline-hangarin" style="font-size:12px">Clear Filters</a>
       {% endif %}
     </form>
   </div>
@@ -93,7 +105,7 @@
   {% else %}
   <div class="p-4 text-center" style="color:var(--muted);font-size:13px">
     No subtasks found.
-    {% if search or task_filter %}
+    {% if search or task_filter or status_filter %}
       <a href="{% url 'subtask_list' %}" style="color:var(--accent)">Clear filters →</a>
     {% else %}
       <a href="{% url 'subtask_add' %}" style="color:var(--accent)">Add one →</a>
