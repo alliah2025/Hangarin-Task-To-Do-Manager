@@ -2,35 +2,34 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.dashboard, name='dashboard'),
-    path('tasks/', views.task_list, name='task_list'),
-    path('tasks/add/', views.task_add, name='task_add'),
-    path('tasks/<int:pk>/', views.task_detail, name='task_detail'),
-    path('tasks/<int:pk>/edit/', views.task_edit, name='task_edit'),
-    path('tasks/<int:pk>/delete/', views.task_delete, name='task_delete'),
+    path('', views.DashboardView.as_view(), name='dashboard'),
+    path('tasks/', views.TaskListView.as_view(), name='task_list'),
+    path('tasks/add/', views.TaskAddView.as_view(), name='task_add'),
+    path('tasks/<int:pk>/', views.TaskDetailView.as_view(), name='task_detail'),
+    path('tasks/<int:pk>/edit/', views.TaskEditView.as_view(), name='task_edit'),
+    path('tasks/<int:pk>/delete/', views.TaskDeleteView.as_view(), name='task_delete'),
 
     # Notes
-    path('notes/', views.note_list, name='note_list'),
-    path('notes/add/', views.note_add, name='note_add'),
-    path('notes/<int:pk>/edit/', views.note_edit, name='note_edit'),
-    path('notes/<int:pk>/confirm-delete/', views.note_confirm_delete, name='note_confirm_delete'),
+    path('notes/', views.NoteListView.as_view(), name='note_list'),
+    path('notes/add/', views.NoteAddView.as_view(), name='note_add'),
+    path('notes/<int:pk>/edit/', views.NoteEditView.as_view(), name='note_edit'),
+    path('notes/<int:pk>/confirm-delete/', views.NoteConfirmDeleteView.as_view(), name='note_confirm_delete'),
 
     # Subtasks
-    path('subtasks/', views.subtask_list, name='subtask_list'),
-    path('subtasks/add/', views.subtask_add, name='subtask_add'),
-    path('subtasks/<int:pk>/edit/', views.subtask_edit, name='subtask_edit'),
-    path('subtasks/<int:pk>/confirm-delete/', views.subtask_confirm_delete, name='subtask_confirm_delete'),
+    path('subtasks/', views.SubtaskListView.as_view(), name='subtask_list'),
+    path('subtasks/add/', views.SubtaskAddView.as_view(), name='subtask_add'),
+    path('subtasks/<int:pk>/edit/', views.SubtaskEditView.as_view(), name='subtask_edit'),
+    path('subtasks/<int:pk>/confirm-delete/', views.SubtaskConfirmDeleteView.as_view(), name='subtask_confirm_delete'),
 
     # Categories
-    path('categories/', views.category_list, name='category_list'),
-    path('categories/add/', views.category_add, name='category_add'),
-    path('categories/<int:pk>/edit/', views.category_edit, name='category_edit'),
-    path('categories/<int:pk>/confirm-delete/', views.category_confirm_delete, name='category_confirm_delete'),
+    path('categories/', views.CategoryListView.as_view(), name='category_list'),
+    path('categories/add/', views.CategoryAddView.as_view(), name='category_add'),
+    path('categories/<int:pk>/edit/', views.CategoryEditView.as_view(), name='category_edit'),
+    path('categories/<int:pk>/confirm-delete/', views.CategoryConfirmDeleteView.as_view(), name='category_confirm_delete'),
 
     # Priorities
-    path('priorities/', views.priority_list, name='priority_list'),
-    path('priorities/add/', views.priority_add, name='priority_add'),
-    path('priorities/<int:pk>/edit/', views.priority_edit, name='priority_edit'),
-    path('priorities/<int:pk>/confirm-delete/', views.priority_confirm_delete, name='priority_confirm_delete'),
+    path('priorities/', views.PriorityListView.as_view(), name='priority_list'),
+    path('priorities/add/', views.PriorityAddView.as_view(), name='priority_add'),
+    path('priorities/<int:pk>/edit/', views.PriorityEditView.as_view(), name='priority_edit'),
+    path('priorities/<int:pk>/confirm-delete/', views.PriorityConfirmDeleteView.as_view(), name='priority_confirm_delete'),
 ]
-
