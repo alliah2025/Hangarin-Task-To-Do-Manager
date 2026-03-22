@@ -3,12 +3,11 @@ from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
 from django.db.models import Q
+from django.views.generic.list import ListView
 
 from .models import Task, Category, Priority, Note, SubTask
 from .forms import TaskForm
 
-
-# ---- DASHBOARD ----
 class DashboardView(LoginRequiredMixin, View):
     def get(self, request):
         tasks = Task.objects.select_related('priority', 'category').order_by('-created_at')[:10]
@@ -40,35 +39,39 @@ class DashboardView(LoginRequiredMixin, View):
         }
         return render(request, 'tasks/dashboard.html', context)
 
+class TaskListView(LoginRequiredMixin, ListView):
+    model = Task
+    template_name = 'tasks/task_list.html'
+    context_object_name = 'tasks'
+    paginate_by = 10
 
-# ---- TASKS ----
-class TaskListView(LoginRequiredMixin, View):
-    def get(self, request):
-        tasks = Task.objects.select_related('priority', 'category').order_by('-created_at')
-        search = request.GET.get('search', '')
-        status_filter = request.GET.get('status', '')
-        category_filter = request.GET.get('category', '')
-        priority_filter = request.GET.get('priority', '')
+    def get_queryset(self):
+        qs = super().get_queryset().select_related('priority', 'category').order_by('-created_at')
+        search = self.request.GET.get('search', '')
+        status_filter = self.request.GET.get('status', '')
+        category_filter = self.request.GET.get('category', '')
+        priority_filter = self.request.GET.get('priority', '')
 
         if search:
-            tasks = tasks.filter(Q(title__icontains=search) | Q(description__icontains=search))
+            qs = qs.filter(Q(title__icontains=search) | Q(description__icontains=search))
         if status_filter:
-            tasks = tasks.filter(status=status_filter)
+            qs = qs.filter(status=status_filter)
         if category_filter:
-            tasks = tasks.filter(category_id=category_filter)
+            qs = qs.filter(category_id=category_filter)
         if priority_filter:
-            tasks = tasks.filter(priority_id=priority_filter)
+            qs = qs.filter(priority_id=priority_filter)
+        return qs
 
-        return render(request, 'tasks/task_list.html', {
-            'tasks': tasks,
-            'total_tasks': Task.objects.count(),
-            'categories': Category.objects.all(),
-            'priorities': Priority.objects.all(),
-            'search': search,
-            'status_filter': status_filter,
-            'category_filter': category_filter,
-            'priority_filter': priority_filter,
-        })
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['total_tasks'] = Task.objects.count()
+        context['categories'] = Category.objects.all()
+        context['priorities'] = Priority.objects.all()
+        context['search'] = self.request.GET.get('search', '')
+        context['status_filter'] = self.request.GET.get('status', '')
+        context['category_filter'] = self.request.GET.get('category', '')
+        context['priority_filter'] = self.request.GET.get('priority', '')
+        return context
 
 
 class TaskDetailView(LoginRequiredMixin, View):
@@ -139,31 +142,34 @@ class TaskDeleteView(LoginRequiredMixin, View):
         task.delete()
         return redirect('task_list')
 
+class NoteListView(LoginRequiredMixin, ListView):
+    model = Note
+    template_name = 'tasks/note_list.html'
+    context_object_name = 'notes'
+    paginate_by = 10
 
-# ---- NOTES ----
-class NoteListView(LoginRequiredMixin, View):
-    def get(self, request):
-        notes = Note.objects.select_related('task').order_by('-created_at')
-        search = request.GET.get('search', '')
-        task_filter = request.GET.get('task', '')
-        date_filter = request.GET.get('date', '')
+    def get_queryset(self):
+        qs = super().get_queryset().select_related('task').order_by('-created_at')
+        search = self.request.GET.get('search', '')
+        task_filter = self.request.GET.get('task', '')
+        date_filter = self.request.GET.get('date', '')
 
         if search:
-            notes = notes.filter(content__icontains=search)
+            qs = qs.filter(content__icontains=search)
         if task_filter:
-            notes = notes.filter(task_id=task_filter)
+            qs = qs.filter(task_id=task_filter)
         if date_filter:
-            notes = notes.filter(created_at__date=date_filter)
+            qs = qs.filter(created_at__date=date_filter)
+        return qs
 
-        return render(request, 'tasks/note_list.html', {
-            'notes': notes,
-            'tasks': Task.objects.all(),
-            'total_tasks': Task.objects.count(),
-            'search': search,
-            'task_filter': task_filter,
-            'date_filter': date_filter,
-        })
-
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['total_tasks'] = Task.objects.count()
+        context['tasks'] = Task.objects.all()
+        context['search'] = self.request.GET.get('search', '')
+        context['task_filter'] = self.request.GET.get('task', '')
+        context['date_filter'] = self.request.GET.get('date', '')
+        return context
 
 class NoteAddView(LoginRequiredMixin, View):
     def get(self, request):
@@ -213,31 +219,34 @@ class NoteConfirmDeleteView(LoginRequiredMixin, View):
         note.delete()
         return redirect('note_list')
 
+class SubtaskListView(LoginRequiredMixin, ListView):
+    model = SubTask
+    template_name = 'tasks/subtask_list.html'
+    context_object_name = 'subtasks'
+    paginate_by = 10
 
-# ---- SUBTASKS ----
-class SubtaskListView(LoginRequiredMixin, View):
-    def get(self, request):
-        subtasks = SubTask.objects.select_related('parent_task').order_by('-id')
-        task_filter = request.GET.get('task', '')
-        status_filter = request.GET.get('status', '')
-        search = request.GET.get('search', '')
+    def get_queryset(self):
+        qs = super().get_queryset().select_related('parent_task').order_by('-id')
+        task_filter = self.request.GET.get('task', '')
+        status_filter = self.request.GET.get('status', '')
+        search = self.request.GET.get('search', '')
 
         if task_filter:
-            subtasks = subtasks.filter(parent_task_id=task_filter)
+            qs = qs.filter(parent_task_id=task_filter)
         if status_filter:
-            subtasks = subtasks.filter(status=status_filter)
+            qs = qs.filter(status=status_filter)
         if search:
-            subtasks = subtasks.filter(title__icontains=search)
+            qs = qs.filter(title__icontains=search)
+        return qs
 
-        return render(request, 'tasks/subtask_list.html', {
-            'subtasks': subtasks,
-            'tasks': Task.objects.all(),
-            'total_tasks': Task.objects.count(),
-            'task_filter': task_filter,
-            'status_filter': status_filter,
-            'search': search,
-        })
-
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['total_tasks'] = Task.objects.count()
+        context['tasks'] = Task.objects.all()
+        context['task_filter'] = self.request.GET.get('task', '')
+        context['status_filter'] = self.request.GET.get('status', '')
+        context['search'] = self.request.GET.get('search', '')
+        return context
 
 class SubtaskAddView(LoginRequiredMixin, View):
     def get(self, request):
@@ -290,8 +299,6 @@ class SubtaskConfirmDeleteView(LoginRequiredMixin, View):
         subtask.delete()
         return redirect('subtask_list')
 
-
-# ---- CATEGORIES ----
 class CategoryListView(LoginRequiredMixin, View):
     def get(self, request):
         search = request.GET.get('search', '')
@@ -354,8 +361,6 @@ class CategoryConfirmDeleteView(LoginRequiredMixin, View):
         category.delete()
         return redirect('category_list')
 
-
-# ---- PRIORITIES ----
 class PriorityListView(LoginRequiredMixin, View):
     def get(self, request):
         search = request.GET.get('search', '')

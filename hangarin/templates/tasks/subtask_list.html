@@ -10,7 +10,6 @@
     <a href="{% url 'subtask_add' %}" class="btn-hangarin" style="font-size:12px;padding:6px 14px">+ Add Subtask</a>
   </div>
 
-  <!-- Search -->
   <div class="p-3" style="border-bottom:1px solid var(--border)">
     <form method="GET" class="d-flex gap-2">
       <input type="text" name="search" value="{{ search }}" placeholder="Search subtasks..." class="h-form-control">
@@ -23,7 +22,6 @@
     </form>
   </div>
 
-  <!-- Filters -->
   <div class="p-3 d-flex gap-2 flex-wrap" style="border-bottom:1px solid var(--border)">
     <form method="GET" class="d-flex gap-2 flex-wrap align-items-center">
       {% if search %}<input type="hidden" name="search" value="{{ search }}">{% endif %}
@@ -106,11 +104,12 @@
   <div class="p-4 text-center" style="color:var(--muted);font-size:13px">
     No subtasks found.
     {% if search or task_filter or status_filter %}
-      <a href="{% url 'subtask_list' %}" style="color:var(--accent)">Clear filters →</a>
+      <a href="{% url 'subtask_list' %}" style="color:var(--accent)">Clear filters </a>
     {% else %}
-      <a href="{% url 'subtask_add' %}" style="color:var(--accent)">Add one →</a>
+      <a href="{% url 'subtask_add' %}" style="color:var(--accent)">Add one </a>
     {% endif %}
   </div>
   {% endif %}
 </div>
+{% include 'include/pagination.html' %}
 {% endblock %}

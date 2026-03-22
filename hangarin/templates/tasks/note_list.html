@@ -10,7 +10,6 @@
     <a href="{% url 'note_add' %}" class="btn-hangarin" style="font-size:12px;padding:6px 14px">+ Add Note</a>
   </div>
 
-  <!-- Search -->
   <div class="p-3" style="border-bottom:1px solid var(--border)">
     <form method="GET" class="d-flex gap-2">
       <input type="text" name="search" value="{{ search }}" placeholder="Search note content..." class="h-form-control">
@@ -23,7 +22,6 @@
     </form>
   </div>
 
-  <!-- Filters -->
   <div class="p-3 d-flex gap-2 flex-wrap" style="border-bottom:1px solid var(--border)">
     <form method="GET" class="d-flex gap-2 flex-wrap align-items-center">
       {% if search %}<input type="hidden" name="search" value="{{ search }}">{% endif %}
@@ -93,11 +91,12 @@
   <div class="p-4 text-center" style="color:var(--muted);font-size:13px">
     No notes found.
     {% if search or task_filter or date_filter %}
-      <a href="{% url 'note_list' %}" style="color:var(--accent)">Clear filters →</a>
+      <a href="{% url 'note_list' %}" style="color:var(--accent)">Clear filters </a>
     {% else %}
-      <a href="{% url 'note_add' %}" style="color:var(--accent)">Add one →</a>
+      <a href="{% url 'note_add' %}" style="color:var(--accent)">Add one </a>
     {% endif %}
   </div>
   {% endif %}
 </div>
+{% include 'include/pagination.html' %}
 {% endblock %}
