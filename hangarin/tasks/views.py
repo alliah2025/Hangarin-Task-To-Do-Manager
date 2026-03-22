@@ -4,6 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
 from django.db.models import Q
 from django.views.generic.list import ListView
+from .forms import TaskForm, CategoryForm, PriorityForm, NoteForm, SubTaskForm
 
 from .models import Task, Category, Priority, Note, SubTask
 from .forms import TaskForm
@@ -174,37 +175,42 @@ class NoteListView(LoginRequiredMixin, ListView):
 class NoteAddView(LoginRequiredMixin, View):
     def get(self, request):
         return render(request, 'tasks/note_form.html', {
-            'tasks': Task.objects.all(),
+            'form': NoteForm(),
+            'title': 'Add Note',
             'total_tasks': Task.objects.count(),
         })
 
     def post(self, request):
-        task_id = request.POST.get('task')
-        content = request.POST.get('content')
-        if task_id and content:
-            Note.objects.create(task_id=task_id, content=content)
-        return redirect('note_list')
-
+        form = NoteForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('note_list')
+        return render(request, 'tasks/note_form.html', {
+            'form': form,
+            'title': 'Add Note',
+            'total_tasks': Task.objects.count(),
+        })
 
 class NoteEditView(LoginRequiredMixin, View):
     def get(self, request, pk):
         note = get_object_or_404(Note, pk=pk)
         return render(request, 'tasks/note_form.html', {
-            'tasks': Task.objects.all(),
-            'note': note,
+            'form': NoteForm(instance=note),
+            'title': 'Edit Note',
             'total_tasks': Task.objects.count(),
         })
 
     def post(self, request, pk):
         note = get_object_or_404(Note, pk=pk)
-        task_id = request.POST.get('task')
-        content = request.POST.get('content')
-        if task_id and content:
-            note.task_id = task_id
-            note.content = content
-            note.save()
-        return redirect('note_list')
-
+        form = NoteForm(request.POST, instance=note)
+        if form.is_valid():
+            form.save()
+            return redirect('note_list')
+        return render(request, 'tasks/note_form.html', {
+            'form': form,
+            'title': 'Edit Note',
+            'total_tasks': Task.objects.count(),
+        })
 
 class NoteConfirmDeleteView(LoginRequiredMixin, View):
     def get(self, request, pk):
@@ -251,39 +257,42 @@ class SubtaskListView(LoginRequiredMixin, ListView):
 class SubtaskAddView(LoginRequiredMixin, View):
     def get(self, request):
         return render(request, 'tasks/subtask_form.html', {
-            'tasks': Task.objects.all(),
+            'form': SubTaskForm(),
+            'title': 'Add Subtask',
             'total_tasks': Task.objects.count(),
         })
 
     def post(self, request):
-        task_id = request.POST.get('task')
-        title = request.POST.get('title')
-        status = request.POST.get('status', 'Pending')
-        if task_id and title:
-            SubTask.objects.create(parent_task_id=task_id, title=title, status=status)
-        return redirect('subtask_list')
-
+        form = SubTaskForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('subtask_list')
+        return render(request, 'tasks/subtask_form.html', {
+            'form': form,
+            'title': 'Add Subtask',
+            'total_tasks': Task.objects.count(),
+        })
 
 class SubtaskEditView(LoginRequiredMixin, View):
     def get(self, request, pk):
         subtask = get_object_or_404(SubTask, pk=pk)
         return render(request, 'tasks/subtask_form.html', {
-            'tasks': Task.objects.all(),
-            'subtask': subtask,
+            'form': SubTaskForm(instance=subtask),
+            'title': 'Edit Subtask',
             'total_tasks': Task.objects.count(),
         })
 
     def post(self, request, pk):
         subtask = get_object_or_404(SubTask, pk=pk)
-        task_id = request.POST.get('task')
-        title = request.POST.get('title')
-        status = request.POST.get('status', 'Pending')
-        if task_id and title:
-            subtask.parent_task_id = task_id
-            subtask.title = title
-            subtask.status = status
-            subtask.save()
-        return redirect('subtask_list')
+        form = SubTaskForm(request.POST, instance=subtask)
+        if form.is_valid():
+            form.save()
+            return redirect('subtask_list')
+        return render(request, 'tasks/subtask_form.html', {
+            'form': form,
+            'title': 'Edit Subtask',
+            'total_tasks': Task.objects.count(),
+        })
 
 
 class SubtaskConfirmDeleteView(LoginRequiredMixin, View):
@@ -317,36 +326,45 @@ class CategoryListView(LoginRequiredMixin, View):
             'search': search,
         })
 
-
 class CategoryAddView(LoginRequiredMixin, View):
     def get(self, request):
         return render(request, 'tasks/category_form.html', {
+            'form': CategoryForm(),
+            'title': 'Add Category',
             'total_tasks': Task.objects.count(),
         })
 
     def post(self, request):
-        name = request.POST.get('name')
-        if name:
-            Category.objects.create(name=name)
-        return redirect('category_list')
-
+        form = CategoryForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('category_list')
+        return render(request, 'tasks/category_form.html', {
+            'form': form,
+            'title': 'Add Category',
+            'total_tasks': Task.objects.count(),
+        })
 
 class CategoryEditView(LoginRequiredMixin, View):
     def get(self, request, pk):
         category = get_object_or_404(Category, pk=pk)
         return render(request, 'tasks/category_form.html', {
-            'category': category,
+            'form': CategoryForm(instance=category),
+            'title': 'Edit Category',
             'total_tasks': Task.objects.count(),
         })
 
     def post(self, request, pk):
         category = get_object_or_404(Category, pk=pk)
-        name = request.POST.get('name')
-        if name:
-            category.name = name
-            category.save()
-        return redirect('category_list')
-
+        form = CategoryForm(request.POST, instance=category)
+        if form.is_valid():
+            form.save()
+            return redirect('category_list')
+        return render(request, 'tasks/category_form.html', {
+            'form': form,
+            'title': 'Edit Category',
+            'total_tasks': Task.objects.count(),
+        })
 
 class CategoryConfirmDeleteView(LoginRequiredMixin, View):
     def get(self, request, pk):
@@ -379,36 +397,45 @@ class PriorityListView(LoginRequiredMixin, View):
             'search': search,
         })
 
-
 class PriorityAddView(LoginRequiredMixin, View):
     def get(self, request):
         return render(request, 'tasks/priority_form.html', {
+            'form': PriorityForm(),
+            'title': 'Add Priority',
             'total_tasks': Task.objects.count(),
         })
 
     def post(self, request):
-        name = request.POST.get('name')
-        if name:
-            Priority.objects.create(name=name)
-        return redirect('priority_list')
-
+        form = PriorityForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('priority_list')
+        return render(request, 'tasks/priority_form.html', {
+            'form': form,
+            'title': 'Add Priority',
+            'total_tasks': Task.objects.count(),
+        })
 
 class PriorityEditView(LoginRequiredMixin, View):
     def get(self, request, pk):
         priority = get_object_or_404(Priority, pk=pk)
         return render(request, 'tasks/priority_form.html', {
-            'priority': priority,
+            'form': PriorityForm(instance=priority),
+            'title': 'Edit Priority',
             'total_tasks': Task.objects.count(),
         })
 
     def post(self, request, pk):
         priority = get_object_or_404(Priority, pk=pk)
-        name = request.POST.get('name')
-        if name:
-            priority.name = name
-            priority.save()
-        return redirect('priority_list')
-
+        form = PriorityForm(request.POST, instance=priority)
+        if form.is_valid():
+            form.save()
+            return redirect('priority_list')
+        return render(request, 'tasks/priority_form.html', {
+            'form': form,
+            'title': 'Edit Priority',
+            'total_tasks': Task.objects.count(),
+        })
 
 class PriorityConfirmDeleteView(LoginRequiredMixin, View):
     def get(self, request, pk):
