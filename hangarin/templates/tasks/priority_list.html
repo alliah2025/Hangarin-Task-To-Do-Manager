@@ -20,7 +20,8 @@
   </div>
 
   {% if priorities %}
-  <table class="h-table">
+<div style="overflow-x:auto;">
+<table class="h-table">
     <thead>
       <tr>
         <th>Priority</th>
@@ -70,6 +71,7 @@
       {% endfor %}
     </tbody>
   </table>
+</div>
   {% else %}
   <div class="p-4 text-center" style="color:var(--muted);font-size:13px">
     No priorities found.

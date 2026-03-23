@@ -363,7 +363,6 @@ textarea.h-form-control { resize: vertical; min-height: 100px; }
   margin-right: 4px;
 }
 
-/* ---- SIDEBAR OVERLAY ---- */
 .sidebar-overlay {
   display: none;
   position: fixed;
@@ -406,4 +405,68 @@ textarea.h-form-control { resize: vertical; min-height: 100px; }
     padding: 10px 10px;
     font-size: 11px;
   }
+}
+
+.table-responsive-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 1024px) {
+  .stat-value { font-size: 28px; }
+}
+
+@media (max-width: 768px) {
+  .hamburger-btn { display: flex; align-items: center; }
+
+  .sidebar {
+    position: fixed;
+    left: -255px;
+    transition: left 0.25s ease;
+    z-index: 1000;
+  }
+
+  .sidebar.open { left: 0; }
+
+  .main-wrapper {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .topbar { padding: 0 14px; gap: 8px; }
+  .topbar-title { font-size: 14px; }
+
+  .btn-hangarin span { display: none; }
+  .btn-hangarin { padding: 8px 10px; }
+
+  .theme-toggle-btn span:last-child { display: none; }
+  .theme-toggle-btn { padding: 7px 10px; }
+
+  .stat-value { font-size: 24px; }
+  .stat-card { padding: 16px; }
+
+  .h-card { overflow-x: auto; }
+  .h-table { min-width: 600px; }
+
+  .h-table th, .h-table td {
+    padding: 10px 10px;
+    font-size: 11px;
+  }
+
+  .d-flex.gap-2.flex-wrap { flex-direction: column; }
+  .h-form-control { width: 100% !important; min-width: unset !important; }
+
+  .row { margin: 0; }
+  .col-lg-8, .col-lg-4 { padding: 0; }
+
+  .p-4 { padding: 16px !important; }
+  .p-3 { padding: 12px !important; }
+}
+
+@media (max-width: 480px) {
+  .stat-value { font-size: 20px; }
+  .h-card-title { font-size: 13px; }
+  .topbar-title { font-size: 13px; }
+  .h-table { min-width: 500px; }
 }

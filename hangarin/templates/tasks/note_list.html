@@ -47,7 +47,8 @@
   </div>
 
   {% if notes %}
-  <table class="h-table">
+<div style="overflow-x:auto;">
+<table class="h-table">
     <thead>
       <tr>
         <th>Note</th>
@@ -87,6 +88,7 @@
       {% endfor %}
     </tbody>
   </table>
+</div>
   {% else %}
   <div class="p-4 text-center" style="color:var(--muted);font-size:13px">
     No notes found.
